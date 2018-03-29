@@ -1,0 +1,27 @@
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i);
+@import 'normalize.css';
+
+:global html, :global body, :global #__next {
+  width: 100%;
+  height: 100%;
+}
+
+.root {
+  background: #202020;
+  color: #ffffff;
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+  height: 100%;
+}
+
+::selection {
+  background: #a0a0a0;
+}
+
+.loading {
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

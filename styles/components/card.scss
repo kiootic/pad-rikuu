@@ -1,0 +1,9 @@
+.loading {
+  & > div {
+    width: 80%;
+    height: 80%;
+    margin: 10%;
+    border: solid 1px #808080;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='); 
+  }
+}
