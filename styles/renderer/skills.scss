@@ -1,0 +1,57 @@
+.skill {
+  padding-bottom: 1em;
+  li:last-child {
+    padding-bottom: 0;
+  }
+
+  ul {
+    margin-bottom: 0;
+  }
+}
+
+.item {
+  > .kind {
+    font-weight: bold;
+    margin-right: 8px;
+  }
+}
+
+.turns {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.attr {
+  font-weight: bold;
+  &.attr-fixed { font-weight: inherit; font-style: italic; }
+  &.attr-0 { color: #ff0000; }
+  &.attr-1 { color: #0000ff; }
+  &.attr-2 { color: #00ff00; }
+  &.attr-3 { color: #ffff00; }
+  &.attr-4 { color: #a000a0; }
+  &.attr-5 { color: #ff80ff; }
+  &.attr-6 { color: #a0a0a0; }
+  &.attr-7 { color: #a080a0; }
+  &.attr-8 { color: #a080a0; }
+}
+
+.stats {
+  font-weight: bold;
+}
+
+.type {
+  font-weight: bold;
+  color: #ff8000;
+}
+
+.spacer {
+  padding: 0 8px 0 8px;
+}
+
+.icon {
+  padding: 0 4px 0 4px;
+}
+
+.status {
+  font-style: italic;
+}

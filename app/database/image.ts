@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import * as Konva from 'konva';
+import { padStart } from 'lodash';
 import { fetchImage } from 'app/utils';
 
 interface Entry {
@@ -21,11 +21,21 @@ export class ImageDB {
   @observable
   public images: Map<string, Entry> = null;
 
-  public async resolve(id: string) {
-    const entry = this.images.get(id);
+  public resolve(type: string, id: number) {
+    const key = `${type}_${padStart(id.toString(), 3, '0')}`;
+    const entry = this.images.get(key);
     if (!entry)
-      throw new Error(`no image with id '${id}'`);
-    return await fetchImage(`/static/data/images/${this.version}/${entry.isCards ? 'cards' : 'mons'}/${id}.png`);
+      throw new Error(`no image with id '${key}'`);
+
+    return {
+      path: `/static/data/images/${this.version}/${entry.isCards ? 'cards' : 'mons'}/${key}.png`,
+      width: entry.width,
+      height: entry.height
+    };
+  }
+
+  public async resolveImage(type: string, id: number) {
+    return await fetchImage(this.resolve(type, id).path);
   }
 
   @action

@@ -18,6 +18,15 @@ export class Store {
   public imageDB = new ImageDB();
   public cardDB = new CardDB();
 
+  @observable
+  private states = new Map<string, any>();
+  public getState<T>(component: Object, stateClass: { new(): T }) {
+    const name = component.constructor.name;
+    let state = this.states.get(name);
+    if (!state) this.states.set(name, state = new stateClass());
+    return state;
+  }
+
   @computed
   public get isLoaded() {
     return this.gameDB.isLoaded && this.assetDB.isLoaded && this.imageDB.isLoaded;
@@ -25,10 +34,12 @@ export class Store {
 
   @action.bound
   public async load() {
+    console.log('s')
     await Promise.all([
       this.gameDB.load(),
       this.assetDB.load(),
       this.imageDB.load()
     ]);
+    console.log('e')
   }
 }

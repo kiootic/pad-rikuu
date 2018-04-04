@@ -1,8 +1,13 @@
+import React from 'react';
 import { observable, action } from 'mobx';
 import { fetchImage } from 'app/utils';
 
 const assetNames = [
-  'card-frame'
+  'card-frame',
+  'icons24',
+  'icons32',
+  'icons36',
+  'icons76',
 ];
 
 interface AtlasMetadata<T=any> {

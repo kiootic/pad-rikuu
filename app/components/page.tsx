@@ -3,8 +3,12 @@ import { observer } from 'mobx-react';
 import { Store } from 'app/store';
 import css from 'styles/components/page.scss';
 
+interface PageProps {
+  childrenFn(): JSX.Element;
+}
+
 @observer
-export class Page extends React.Component {
+class PageComponent extends React.Component<PageProps> {
   private readonly store = Store.instance;
 
   componentDidMount() {
@@ -14,9 +18,19 @@ export class Page extends React.Component {
 
   render() {
     if (this.store.isLoaded) {
-      return <div className={css.root}>{this.props.children}</div>;
+      return (
+        <div className={css.root}>
+          <div className={css.main}>
+            {this.props.childrenFn()}
+          </div>
+        </div>
+      );
     } else {
       return <div className={`${css.root} ${css.loading}`}>loading...</div>;
     }
   }
+}
+
+export function Page(children: () => JSX.Element) {
+  return <PageComponent childrenFn={children} />
 }

@@ -3,10 +3,12 @@ import { observer } from 'mobx-react';
 import { Store } from 'app/store';
 import Link from 'next/link';
 import css from 'styles/components/card.scss';
+import { CardSize } from 'app/renderer/card';
 
 export interface CardProps {
   id: number;
-  style: CSSProperties;
+  style?: CSSProperties;
+  link?: boolean;
 }
 
 @observer
@@ -18,7 +20,7 @@ export class Card extends React.Component<CardProps> {
   }
 
   componentWillReceiveProps(props: CardProps) {
-    this.store.cardDB.requestIcon(this.props.id);
+    this.store.cardDB.requestIcon(props.id);
   }
 
   render() {
@@ -29,11 +31,14 @@ export class Card extends React.Component<CardProps> {
       content = <div className={css.loading} style={this.props.style}><div /></div>;
     else
       content = <img src={icon.atlas} style={{
-        ...this.props.style,
+        width: CardSize,
+        height: CardSize,
         objectFit: 'none',
-        objectPosition: `-${icon.x}px -${icon.y}px`
+        objectPosition: `-${icon.x}px -${icon.y}px`,
+        ...this.props.style
       }} />;
 
-    return <Link><a href={`/card?id=${this.props.id}`}>{content}</a></Link>
+    if (this.props.link === false) return content;
+    else return <Link href={`/card?id=${this.props.id}`}><a>{content}</a></Link>
   }
 }

@@ -1,0 +1,21 @@
+.main {
+  display: flex;
+  flex-direction: row;
+  padding: 16px;
+
+  .nav {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #ffffff;
+
+    &:hover {
+      background: rgba(#ffffff, 0.25)
+    }
+  }
+
+  .info {
+    width: 800px;
+  }
+}

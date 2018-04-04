@@ -16,7 +16,7 @@ export class CardRenderer {
 
     let tex = this.texMap.get(texId);
     if (!tex) {
-      tex = Store.instance.imageDB.resolve(`cards_${texId.toString().padStart(3, '0')}`);
+      tex = Store.instance.imageDB.resolveImage('cards', texId);
       this.texMap.set(texId, tex);
     }
     return tex;

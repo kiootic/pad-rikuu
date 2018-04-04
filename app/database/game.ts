@@ -7,7 +7,7 @@ export class GameDB {
   @observable.shallow
   public cards: any[] | null = null;
 
-  @observable
+  @observable.shallow
   public skills: any[] | null = null;
 
   @action

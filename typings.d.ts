@@ -4,3 +4,9 @@ declare module '*.scss' {
 }
 
 declare const process: NodeJS.Process & { browser: boolean };
+
+declare interface Url {
+  pathname: String;
+  query: Record<string, string>;
+  asPath: String;
+}
