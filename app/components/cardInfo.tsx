@@ -5,12 +5,13 @@ import Link from 'next/link';
 
 import { Store } from 'app/store';
 import { Asset } from 'app/components/asset';
-import { Card } from 'app/components/card';
+import { CardIcon } from 'app/components/cardIcon';
 import css from 'styles/components/cardInfo.scss';
 import { observable, computed, action } from 'mobx';
 import { computeValue, Curve } from 'app/utils/curve';
 import { SkillParser } from 'app/parser/skill';
 import { renderSkills } from "app/renderer/skill";
+import { CardImage } from 'app/components/cardImage';
 
 export interface CardInfoProps {
   id: number;
@@ -80,17 +81,10 @@ export class CardInfo extends React.Component<CardInfoProps> {
 
     return <main className={[css.main, this.props.className].join(' ')}>
       <section className={css.picture}>
-        <img className={css.bg} src='/static/data/assets/card-bg.png' draggable={false} />
-        <img src={entry.path} className={css.image} style={{
-          objectFit: 'none',
-          objectPosition: '0 0',
-          width: entry.width,
-          height: '100%',
-          top: `${640 * 2 / 3 - entry.height}px`
-        }} />
+        <CardImage id={this.id} />
       </section>
       <section className={css.summary}>
-        <Card id={this.id} link={false} />
+        <CardIcon id={this.id} link={false} />
         <p className={css.basic}>
           No. {this.id} <br />
           <strong className={css.title}>{this.card.name}</strong> <br />

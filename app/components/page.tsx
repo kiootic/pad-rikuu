@@ -1,5 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
+import DevTools from 'mobx-react-devtools';
 import { Store } from 'app/store';
 import css from 'styles/components/page.scss';
 
@@ -23,6 +24,7 @@ class PageComponent extends React.Component<PageProps> {
           <div className={css.main}>
             {this.props.childrenFn()}
           </div>
+          <DevTools />
         </div>
       );
     } else {

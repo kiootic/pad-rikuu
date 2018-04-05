@@ -2,7 +2,7 @@ import { observable, action, configure, computed } from 'mobx';
 import { GameDB } from 'app/database/game';
 import { AssetDB } from 'app/database/assets';
 import { ImageDB } from 'app/database/image';
-import { CardDB } from 'app/database/card';
+import { IconDB } from 'app/database/icon';
 
 configure({ enforceActions: true });
 
@@ -16,11 +16,11 @@ export class Store {
   public gameDB = new GameDB();
   public assetDB = new AssetDB();
   public imageDB = new ImageDB();
-  public cardDB = new CardDB();
+  public iconDB = new IconDB();
 
   @observable
   private states = new Map<string, any>();
-  public getState<T>(component: Object, stateClass: { new(): T }) {
+  public getState<T>(component: Object, stateClass: { new(): T }): T {
     const name = component.constructor.name;
     let state = this.states.get(name);
     if (!state) this.states.set(name, state = new stateClass());

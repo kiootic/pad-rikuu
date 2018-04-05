@@ -14,24 +14,8 @@
   }
 
   .picture {
-    position: relative;
-    width: 640px;
-    height: 512px;
-    padding: 0;
-    overflow: hidden;
-    user-select: none;
-
-    .bg {
-      position: absolute;
-      width: 640px;
-      height: 640px;
-    }
-    .image {
-      position: absolute;
-      left: 0;
-      right: 0;
-      margin: auto;
-    }
+    line-height: 0;
+    width: auto;
   }
 
   .summary {

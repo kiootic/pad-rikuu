@@ -8,6 +8,7 @@ const assetNames = [
   'icons32',
   'icons36',
   'icons76',
+  'card-bg',
 ];
 
 interface AtlasMetadata<T=any> {

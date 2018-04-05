@@ -10,7 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "konva": "^2.0.2",
+    "gl-matrix": "^2.4.0",
     "lodash": "^4.17.5",
     "mobx": "^4.1.0",
     "mobx-react": "^5.0.0",
@@ -19,16 +19,20 @@
     "normalize.css": "^8.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-virtualized": "^9.18.5"
+    "react-virtualized": "^9.18.5",
+    "three": "^0.91.0"
   },
   "devDependencies": {
+    "@types/gl-matrix": "^2.4.0",
     "@types/lodash": "^4.14.106",
     "@types/next": "^2.4.8",
     "@types/react": "^16.1.0",
     "@types/react-virtualized": "^9.7.14",
+    "@types/three": "^0.91.3",
     "@zeit/next-sass": "^0.1.2",
     "@zeit/next-typescript": "^0.0.11",
     "fork-ts-checker-webpack-plugin": "^0.4.1",
+    "mobx-react-devtools": "^5.0.1",
     "node-sass": "^4.8.3",
     "typescript": "^2.8.1"
   }

@@ -20,17 +20,20 @@ export class Deferred<T> {
 
   @observable
   private _status = DeferredStatus.Pending;
-  @observable
+  @observable.ref
   private _value: T;
 
   @computed
   public get status() { return this._status; }
   @computed
   public get result() {
-    if (this._status !== DeferredStatus.Fulfilled)
+    if (!this.fulfilled)
       throw new Error('result is not available');
     return this._value;
   }
+
+  @computed
+  public get fulfilled() { return this._status == DeferredStatus.Fulfilled; }
 
   @action.bound
   public resolve(value: T) {
@@ -43,7 +46,16 @@ export class Deferred<T> {
     this._status = DeferredStatus.Rejected;
     return this._reject(reason);
   }
-  public attach(promise: Promise<T>) { return promise.then(this.resolve, this.reject) };
+
+  public attach(promise: PromiseLike<T>) {
+    promise.then(this.resolve, this.reject);
+  }
+
+  public static from<T>(promise: PromiseLike<T>) {
+    const deferred = new Deferred<T>();
+    deferred.attach(promise);
+    return deferred;
+  }
 
   public static resolve<T>(value: T) {
     const deferred = new Deferred<T>();

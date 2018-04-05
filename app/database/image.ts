@@ -2,13 +2,24 @@ import { observable, action } from 'mobx';
 import { padStart } from 'lodash';
 import { fetchImage } from 'app/utils';
 
-interface Entry {
+interface DBEntry {
   key: string;
   isCards: boolean;
   id: number;
   width: number;
   height: number;
   lastUpdate: number;
+
+  frames: number;
+  files: string[];
+}
+
+export interface Entry {
+  basePath: string;
+  width: number;
+  height: number;
+  frames: number;
+  files: string[];
 }
 
 export class ImageDB {
@@ -19,29 +30,37 @@ export class ImageDB {
   public version: string = null;
 
   @observable
-  public images: Map<string, Entry> = null;
+  private images: Map<string, DBEntry> = null;
 
-  public resolve(type: string, id: number) {
+  public resolve(type: string, id: number): Entry {
     const key = `${type}_${padStart(id.toString(), 3, '0')}`;
     const entry = this.images.get(key);
     if (!entry)
       throw new Error(`no image with id '${key}'`);
 
     return {
-      path: `/static/data/images/${this.version}/${entry.isCards ? 'cards' : 'mons'}/${key}.png`,
+      basePath: `/static/data/images/${this.version}/${entry.isCards ? 'cards' : 'mons'}`,
       width: entry.width,
-      height: entry.height
+      height: entry.height,
+      frames: entry.frames,
+      files: entry.files
     };
   }
 
-  public async resolveImage(type: string, id: number) {
-    return await fetchImage(this.resolve(type, id).path);
+  public async fetchImage(entry: Entry, file: string = null) {
+    const path = `${entry.basePath}/${file || entry.files[0]}`;
+    return await fetchImage(path);
+  }
+
+  public async fetchFile(entry: Entry, file: string = null) {
+    const path = `${entry.basePath}/${file || entry.files[0]}`;
+    return await fetch(path).then(resp => resp.json());
   }
 
   @action
-  private onLoaded(version: string, extlist: Entry[]) {
+  private onLoaded(version: string, extlist: DBEntry[]) {
     this.version = version;
-    this.images = new Map(extlist.map<[string, Entry]>(entry => [entry.key, entry]));
+    this.images = new Map(extlist.map<[string, DBEntry]>(entry => [entry.key, entry]));
     this.isLoaded = true;
   }
 

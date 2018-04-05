@@ -2,13 +2,13 @@ import { Store } from 'app/store';
 import { Canvas } from 'app/utils/canvas';
 import { fetchImage } from 'app/utils';
 
-const IconSize = 102;
-const IconPosition = { x: 10, y: 11 };
-export const CardSize = 120;
+const ImageSize = 102;
+const ImagePosition = { x: 10, y: 11 };
+export const IconSize = 120;
 
-export class CardRenderer {
+export class IconRenderer {
   private constructor() { }
-  public static readonly instance = process.browser ? new CardRenderer() : null;
+  public static readonly instance = process.browser ? new IconRenderer() : null;
 
   private readonly texMap = new Map<number, Promise<HTMLImageElement>>();
   private async getIconTex(setId: number) {
@@ -16,7 +16,8 @@ export class CardRenderer {
 
     let tex = this.texMap.get(texId);
     if (!tex) {
-      tex = Store.instance.imageDB.resolveImage('cards', texId);
+      const images = Store.instance.imageDB;
+      tex = images.fetchImage(images.resolve('cards', texId));
       this.texMap.set(texId, tex);
     }
     return tex;
@@ -34,21 +35,21 @@ export class CardRenderer {
     const { assets } = Store.instance.assetDB;
 
     const iconTex = await this.getIconTex(setId);
-    const canvas = Canvas.instance.begin(CardSize * 10, CardSize * 10);
+    const canvas = Canvas.instance.begin(IconSize * 10, IconSize * 10);
 
     const cards = Store.instance.gameDB.cards.filter(card => this.getIconSet(card.id).id == setId);
 
     for (const card of cards) {
       const col = ((card.id - 1) % 10), row = (Math.floor((card.id - 1) / 10) % 10);
-      const x = CardSize * col, y = CardSize * row;
+      const x = IconSize * col, y = IconSize * row;
 
       canvas.drawImage({
         image: iconTex,
-        x: IconSize * col,
-        y: IconSize * row,
-        width: IconSize,
-        height: IconSize
-      }, x + IconPosition.x, y + IconPosition.y);
+        x: ImageSize * col,
+        y: ImageSize * row,
+        width: ImageSize,
+        height: ImageSize
+      }, x + ImagePosition.x, y + ImagePosition.y);
 
       if (card.attrs[0] !== -1)
         canvas.drawImage(assets.get(`card-frame-${card.attrs[0]}`), x, y);
