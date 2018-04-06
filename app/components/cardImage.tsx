@@ -23,7 +23,7 @@ export class CardImage<T> extends React.Component<CardImageProps> {
   }
 
   render() {
-    return <AnimatedCanvas width={640} height={512} fps={20}
+    return <AnimatedCanvas width={640} height={512} fps={40}
       render={(context, time) => this.renderer.render(context, time)} />
   }
 }

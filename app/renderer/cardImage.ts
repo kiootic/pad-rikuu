@@ -1,11 +1,11 @@
 import { Deferred } from "app/utils/deferred";
 import { Store } from "app/store";
 import { Entry } from "app/database/image";
-import { times, range, flatMap } from 'lodash';
+import { times, range, flatMap, max } from 'lodash';
 import { vec2, mat4, mat2d } from 'gl-matrix';
 import {
   WebGLRenderer, TextureLoader, Texture, Sprite,
-  SpriteMaterial, Scene, OrthographicCamera, Vector2, Vector3, RepeatWrapping, Mesh, Geometry, Face3, MeshBasicMaterial, Group, DoubleSide, BoxBufferGeometry, PlaneGeometry
+  SpriteMaterial, Scene, OrthographicCamera, Vector2, Vector3, RepeatWrapping, Mesh, Geometry, Face3, MeshBasicMaterial, Group, DoubleSide, BoxBufferGeometry, PlaneGeometry, Material
 } from 'three';
 
 export const CanvasSize = 640;
@@ -118,8 +118,8 @@ export class CardImageRenderer {
     const bones = isc.bones.map((bone: any, i: number) => {
       const [, angle, sx, sy, tx, ty] = bone.transform;
       const mat = mat2d.identity(mat2d.create());
-      mat2d.scale(mat, mat, [sx, sy, 1]);
       mat2d.translate(mat, mat, [tx, ty, 0]);
+      mat2d.scale(mat, mat, [sx, sy, 1]);
       mat2d.rotate(mat, mat, angle * Math.PI / 180);
       return {
         id: i,
@@ -147,6 +147,7 @@ export class CardImageRenderer {
       });;
       return {
         id: i,
+        meshId: skin.meshId,
         skinName: skin.name,
         meshName: mesh.name,
         imageId: mesh.imageId,
@@ -161,22 +162,162 @@ export class CardImageRenderer {
         bones[isc.bones[i].parent].children.push(bones[i]);
     }
 
-    const slots = flatMap(isc.slots.filter((slot: any) => slot.skinId >= 0), (slot: any) => {
-      const tint = ((slot.tint & 0xff) << 16) | (slot.tint & 0xff00) | ((slot.tint & 0xff0000) >> 16);
-      const skin = skins[slot.skinId];
+    const slots = isc.slots
+      .map((slot: any, i: number) => {
+        const tint = ((slot.tint & 0xff) << 16) | (slot.tint & 0xff00) | ((slot.tint & 0xff0000) >> 16);
 
-      return {
-        bone: bones[slot.boneId],
-        skin: skins[slot.skinId],
-        tint,
-        isMono: slot.flags === 1
-      }
-    });
+        return {
+          slotId: i,
+          bone: bones[slot.boneId],
+          skin: skins[slot.skinId],
+          tint,
+          isMono: slot.flags === 1
+        }
+      })
+      .filter((slot: any) => slot.skin);
 
     return { root: bones[0], slots };
   }
 
+  private constructAnimation(isa: any) {
+    function parseAnim(anim: any, type: string) {
+      return {
+        type,
+        ...anim
+      };
+    }
+
+    function createAnimState() {
+      return {
+        mat: mat2d.create(),
+        color: null as number,
+        opacity: 1,
+        visible: true,
+        offsets: [] as number[][],
+        reset() {
+          mat2d.identity(this.mat);
+          this.color = null;
+          this.opacity = 1;
+          this.visible = true;
+          this.offsets = [];
+        }
+      };
+    }
+
+    const animTypes = {
+      bones: ['rotate', 'scale', 'translate'],
+      slots: ['color', 'toggle'],
+      meshs: ['points'],
+    };
+
+    const bones = isa.bones.map((bone: any, id: number) => {
+      if (bone.anims.length === 0) return null;
+      return {
+        boneId: id,
+        anims: bone.anims
+          .map((anim: any, i: number) => anim && parseAnim(anim, animTypes.bones[i]))
+          .filter(Boolean),
+        state: createAnimState()
+      };
+    });
+
+    const slots = isa.slots.map((slot: any, id: number) => {
+      if (slot.anims.length === 0) return null;
+      return {
+        slotId: id,
+        anims: slot.anims
+          .map((anim: any, i: number) => anim && parseAnim(anim, animTypes.slots[i]))
+          .filter(Boolean),
+        state: createAnimState()
+      };
+    });
+
+    const meshs = isa.meshs.map((mesh: any, id: number) => {
+      if (mesh.anims.length === 0) return null;
+      return {
+        meshId: id,
+        anims: mesh.anims
+          .map((anim: any, i: number) => anim && parseAnim(anim, animTypes.meshs[i]))
+          .filter(Boolean),
+        state: createAnimState()
+      };
+    });
+
+    return {
+      bones, slots, meshs
+    };
+  }
+
+  private updateAnimation(time: number) {
+    const { bones, slots, meshs } = this.animation;
+    const animations = flatMap([...bones, ...slots, ...meshs],
+      elem => elem && elem.anims.map((anim: any) => ({ elem, anim }))
+    ).filter(Boolean);
+
+    function interpolate(a: number, b: number, time: number, aFrame: any, bFrame: any) {
+      if (aFrame.interpolation === 'C' || bFrame === aFrame) return a;
+      //if (aFrame.interpolation === 'L') {
+      const t = (time - aFrame.time) / (bFrame.time - aFrame.time);
+      return a + (b - a) * t;
+      //}
+    }
+
+    for (const { elem } of animations) {
+      elem.state.reset();
+    }
+
+    const totalLength = max(animations.map(({ anim }) => anim.length));
+    const animTime = time % totalLength;
+
+    for (const { elem, anim } of animations) {
+      const { length, frames } = anim;
+      let nextFrameIndex = frames.findIndex((frame: any) => frame.time > animTime);
+      if (nextFrameIndex < 0) nextFrameIndex = frames.length;
+
+      const thisFrame = frames[(nextFrameIndex - 1 + frames.length) % frames.length];
+      const nextFrame = frames[nextFrameIndex] || thisFrame;
+      switch (anim.type) {
+        case 'rotate':
+          mat2d.rotate(elem.state.mat, elem.state.mat,
+            interpolate(thisFrame.angle, nextFrame.angle, animTime, thisFrame, nextFrame) * Math.PI / 180
+          );
+          break;
+        case 'translate':
+        case 'scale':
+          (anim.type === 'translate' ? mat2d.translate : mat2d.scale)(elem.state.mat, elem.state.mat, [
+            interpolate(thisFrame.v[0], nextFrame.v[0], animTime, thisFrame, nextFrame),
+            interpolate(thisFrame.v[1], nextFrame.v[1], animTime, thisFrame, nextFrame)
+          ]);
+          break;
+        case 'color': {
+          const opacity = interpolate(Math.floor(thisFrame.color / 0x1000000), Math.floor(nextFrame.color / 0x1000000), animTime, thisFrame, nextFrame);
+          const color =
+            (interpolate((thisFrame.color >> 16) & 0xff, (nextFrame.color >> 16) & 0xff, animTime, thisFrame, nextFrame) << 16) |
+            (interpolate((thisFrame.color >> 8) & 0xff, (nextFrame.color >> 8) & 0xff, animTime, thisFrame, nextFrame) << 8) |
+            (interpolate((thisFrame.color >> 0) & 0xff, (nextFrame.color >> 0) & 0xff, animTime, thisFrame, nextFrame) << 0);
+          elem.state.opacity = opacity / 255;
+          elem.state.color = color;
+        } break;
+        case 'toggle': {
+          elem.state.visible = thisFrame.visible;
+        } break;
+        case 'points': {
+          const thisPoints = thisFrame.points, nextPoints = nextFrame.points;
+          for (const i of range(Math.max(thisPoints.length, nextPoints.length))) {
+            const thisPoint = thisPoints[i] || [0, 0];
+            const nextPoint = nextPoints[i] || [0, 0];
+            elem.state.offsets.push([
+              interpolate(thisPoint[0], nextPoint[0], animTime, thisFrame, nextFrame),
+              interpolate(thisPoint[1], nextPoint[1], animTime, thisFrame, nextFrame)
+            ]);
+          }
+        } break;
+      }
+    }
+  }
+
   private skeleton: any;
+  private animation: any;
   private meshs: Mesh[];
   private updateSkeleton(canvas: HTMLCanvasElement, time: number) {
     const [isc, isa] = this.fetchMetadata();
@@ -185,6 +326,9 @@ export class CardImageRenderer {
 
     if (!this.skeleton) {
       this.skeleton = this.constructSkeleton(isc);
+    }
+    if (!this.animation) {
+      this.animation = this.constructAnimation(isa);
     }
 
     if (!this.scene) {
@@ -212,12 +356,12 @@ export class CardImageRenderer {
           geom.faceVertexUvs[0].push([uvs[f[0]], uvs[f[1]], uvs[f[2]]]);
         }
         geom.uvsNeedUpdate = true;
-        geom.computeFaceNormals();
 
         const mesh = new Mesh(geom, new MeshBasicMaterial({
           map: texs[skin.imageId],
           transparent: true,
           color: tint,
+          side: DoubleSide,
           alphaMap: isMono ? texs[skin.imageId] : null
         }));
         root.add(mesh);
@@ -225,29 +369,55 @@ export class CardImageRenderer {
       }
     }
 
+    this.updateAnimation(time / 1000);
+
     const transforms: mat2d[] = [];
     const computeTransform = (bone: any, parent: mat2d) => {
-      const transform = mat2d.mul(mat2d.create(), parent, bone.mat);
+      const transform = mat2d.clone(parent);
+      mat2d.mul(transform, transform, bone.mat);
+      if (this.animation.bones[bone.id])
+        mat2d.mul(transform, transform, this.animation.bones[bone.id].state.mat);
+
       transforms[bone.id] = transform;
       for (const child of bone.children)
         computeTransform(child, transform);
     }
     computeTransform(this.skeleton.root, mat2d.identity(mat2d.create()));
 
-    for (const { bone, skin, tint } of this.skeleton.slots) {
+    const pt = vec2.create();
+    const applyTransform = (boneId: number, meshId: number, i: number, v: vec2) => {
+      vec2.copy(pt, v);
+
+      if (this.animation.meshs[meshId]) {
+        const offsets = this.animation.meshs[meshId].state.offsets;
+        if (offsets[i]) {
+          pt[0] += offsets[i][0];
+          pt[1] += offsets[i][1];
+        }
+      }
+
+      return vec2.transformMat2d(pt, pt, transforms[boneId]);
+    }
+
+    for (const { slotId, bone, skin, tint } of this.skeleton.slots) {
       const mat = transforms[bone.id];
+      const material = this.meshs[skin.id].material as Material;
       const geom = this.meshs[skin.id].geometry as Geometry;
-      const pt = vec2.create();
+
+      if (this.animation.slots[slotId]) {
+        material.visible = this.animation.slots[slotId].state.visible;
+        material.opacity = this.animation.slots[slotId].state.opacity;
+      }
+
       for (const i of range(skin.vertices.length)) {
         if (skin.isSpring) {
           const t = vec2.create();
           for (const { boneId, v, ratio } of skin.vertices[i].dst) {
-            vec2.transformMat2d(pt, v, transforms[boneId]);
-            vec2.scaleAndAdd(t, t, pt, ratio);
+            vec2.scaleAndAdd(t, t, applyTransform(boneId, skin.meshId, i, v), ratio);
           }
           geom.vertices[i].set(t[0], t[1], 1);
         } else {
-          const [x, y] = vec2.transformMat2d(pt, skin.vertices[i].dst, mat);
+          const [x, y] = applyTransform(bone.id, skin.meshId, i, skin.vertices[i].dst);
           geom.vertices[i].set(x, y, 1);
         }
       }
