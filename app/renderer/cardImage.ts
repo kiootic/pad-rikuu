@@ -4,8 +4,9 @@ import { Entry } from "app/database/image";
 import { times, range, flatMap, max } from 'lodash';
 import { vec2, mat4, mat2d } from 'gl-matrix';
 import {
-  WebGLRenderer, TextureLoader, Texture, Sprite,
-  SpriteMaterial, Scene, OrthographicCamera, Vector2, Vector3, RepeatWrapping, Mesh, Geometry, Face3, MeshBasicMaterial, Group, DoubleSide, BoxBufferGeometry, PlaneGeometry, Material
+  WebGLRenderer, Texture, Sprite, SpriteMaterial, Scene, OrthographicCamera,
+  Vector2, Vector3, RepeatWrapping, Mesh, Geometry, Face3, MeshBasicMaterial,
+  Group, DoubleSide, PlaneGeometry, NormalBlending, AdditiveBlending
 } from 'three';
 
 export const CanvasSize = 640;
@@ -117,14 +118,10 @@ export class CardImageRenderer {
 
     const bones = isc.bones.map((bone: any, i: number) => {
       const [, angle, sx, sy, tx, ty] = bone.transform;
-      const mat = mat2d.identity(mat2d.create());
-      mat2d.translate(mat, mat, [tx, ty, 0]);
-      mat2d.scale(mat, mat, [sx, sy, 1]);
-      mat2d.rotate(mat, mat, angle * Math.PI / 180);
       return {
         id: i,
         name: bone.name,
-        mat: mat,
+        tr: { angle, sx, sy, tx, ty },
         children: [] as any[]
       };
     });
@@ -169,9 +166,9 @@ export class CardImageRenderer {
         return {
           slotId: i,
           bone: bones[slot.boneId],
-          skin: skins[slot.skinId],
+          skin: skins[slot.skinId] || skins.find((skin: any) => skin.skinName === slot.skinName),
           tint,
-          isMono: slot.flags === 1
+          isAdditive: slot.flags === 1
         }
       })
       .filter((slot: any) => slot.skin);
@@ -189,13 +186,13 @@ export class CardImageRenderer {
 
     function createAnimState() {
       return {
-        mat: mat2d.create(),
+        tr: { angle: 0, sx: 1, sy: 1, tx: 0, ty: 0 },
         color: null as number,
         opacity: 1,
         visible: true,
         offsets: [] as number[][],
         reset() {
-          mat2d.identity(this.mat);
+          this.tr = { angle: 0, sx: 1, sy: 1, tx: 0, ty: 0 };
           this.color = null;
           this.opacity = 1;
           this.visible = true;
@@ -254,12 +251,47 @@ export class CardImageRenderer {
       elem => elem && elem.anims.map((anim: any) => ({ elem, anim }))
     ).filter(Boolean);
 
+    function bezier(t: number, a: number, b: number, c: number, d: number) {
+      return a * Math.pow(1 - t, 3) + (3 * b * Math.pow(1 - t, 2) + (3 * c * (1 - t) + d * t) * t) * t;
+    }
+    function bezierD(t: number, a: number, b: number, c: number, d: number) {
+      return 3 * Math.pow(1 - t, 2) * (b - a) + 6 * (1 - t) * t * (c - b) + 3 * t * t * (d - c);
+    }
+
     function interpolate(a: number, b: number, time: number, aFrame: any, bFrame: any) {
       if (aFrame.interpolation === 'C' || bFrame === aFrame) return a;
-      //if (aFrame.interpolation === 'L') {
-      const t = (time - aFrame.time) / (bFrame.time - aFrame.time);
-      return a + (b - a) * t;
-      //}
+      const duration = bFrame.time - aFrame.time;
+
+      if (aFrame.interpolation === 'B') {
+        const { b1, b2, b3, b4 } = aFrame;
+        const x = (time - aFrame.time) / duration;
+
+        let t = x;
+        t -= (bezier(t, 0, b1, b3, 1) - x) / bezierD(t, 0, b1, b3, 1);
+        t -= (bezier(t, 0, b1, b3, 1) - x) / bezierD(t, 0, b1, b3, 1);
+        t -= (bezier(t, 0, b1, b3, 1) - x) / bezierD(t, 0, b1, b3, 1);
+        t -= (bezier(t, 0, b1, b3, 1) - x) / bezierD(t, 0, b1, b3, 1);
+        t -= (bezier(t, 0, b1, b3, 1) - x) / bezierD(t, 0, b1, b3, 1);
+        return a + (b - a) * bezier(t, 0, b2, b4, 1);
+      }
+      if (aFrame.interpolation === 'L') {
+        const t = (time - aFrame.time) / duration;
+        return a + (b - a) * t;
+      }
+    }
+    function interpolateP(a: [number, number], b: [number, number], time: number, aFrame: any, bFrame: any) {
+      if (aFrame.interpolation === 'C' || bFrame === aFrame) return a;
+      const duration = bFrame.time - aFrame.time;
+
+      if (aFrame.interpolation === 'B') {
+        const { b1, b2, b3, b4 } = aFrame;
+        const t = (time - aFrame.time) / duration;
+        return [bezier(t, a[0], b1, b3, b[0]), bezier(t, a[1], b2, b4, b[1])];
+      }
+      if (aFrame.interpolation === 'L') {
+        const t = (time - aFrame.time) / duration;
+        return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      }
     }
 
     for (const { elem } of animations) {
@@ -275,19 +307,22 @@ export class CardImageRenderer {
       if (nextFrameIndex < 0) nextFrameIndex = frames.length;
 
       const thisFrame = frames[(nextFrameIndex - 1 + frames.length) % frames.length];
-      const nextFrame = frames[nextFrameIndex] || thisFrame;
+      const nextFrame = frames[nextFrameIndex] || frames[0];
       switch (anim.type) {
         case 'rotate':
-          mat2d.rotate(elem.state.mat, elem.state.mat,
-            interpolate(thisFrame.angle, nextFrame.angle, animTime, thisFrame, nextFrame) * Math.PI / 180
-          );
+          elem.state.tr.angle += interpolate(thisFrame.angle, nextFrame.angle, animTime, thisFrame, nextFrame);
           break;
         case 'translate':
         case 'scale':
-          (anim.type === 'translate' ? mat2d.translate : mat2d.scale)(elem.state.mat, elem.state.mat, [
-            interpolate(thisFrame.v[0], nextFrame.v[0], animTime, thisFrame, nextFrame),
-            interpolate(thisFrame.v[1], nextFrame.v[1], animTime, thisFrame, nextFrame)
-          ]);
+          const x = interpolate(thisFrame.v[0], nextFrame.v[0], animTime, thisFrame, nextFrame);
+          const y = interpolate(thisFrame.v[1], nextFrame.v[1], animTime, thisFrame, nextFrame);
+          if (anim.type === 'translate') {
+            elem.state.tr.tx += x;
+            elem.state.tr.ty += y;
+          } else {
+            elem.state.tr.sx *= x;
+            elem.state.tr.sy *= y;
+          }
           break;
         case 'color': {
           const opacity = interpolate(Math.floor(thisFrame.color / 0x1000000), Math.floor(nextFrame.color / 0x1000000), animTime, thisFrame, nextFrame);
@@ -306,10 +341,7 @@ export class CardImageRenderer {
           for (const i of range(Math.max(thisPoints.length, nextPoints.length))) {
             const thisPoint = thisPoints[i] || [0, 0];
             const nextPoint = nextPoints[i] || [0, 0];
-            elem.state.offsets.push([
-              interpolate(thisPoint[0], nextPoint[0], animTime, thisFrame, nextFrame),
-              interpolate(thisPoint[1], nextPoint[1], animTime, thisFrame, nextFrame)
-            ]);
+            elem.state.offsets.push(interpolateP(thisPoint, nextPoint, animTime, thisFrame, nextFrame));
           }
         } break;
       }
@@ -342,7 +374,7 @@ export class CardImageRenderer {
 
       const texs = images.map(image => this.loadTex(image));
 
-      for (const { skin, tint, isMono } of this.skeleton.slots) {
+      for (const { skin, tint, isAdditive } of this.skeleton.slots) {
         const geom = new Geometry();
         const uvs: Vector2[] = [];
         for (const v of skin.vertices) {
@@ -362,21 +394,26 @@ export class CardImageRenderer {
           transparent: true,
           color: tint,
           side: DoubleSide,
-          alphaMap: isMono ? texs[skin.imageId] : null
+          blending: isAdditive ? AdditiveBlending : NormalBlending
         }));
         root.add(mesh);
         this.meshs[skin.id] = mesh;
       }
     }
 
-    this.updateAnimation(time / 1000);
+    this.updateAnimation(Math.round(time / 1000 * 30) / 30 + 0.001);
 
     const transforms: mat2d[] = [];
     const computeTransform = (bone: any, parent: mat2d) => {
       const transform = mat2d.clone(parent);
-      mat2d.mul(transform, transform, bone.mat);
-      if (this.animation.bones[bone.id])
-        mat2d.mul(transform, transform, this.animation.bones[bone.id].state.mat);
+
+      const anim = this.animation.bones[bone.id] ?
+        this.animation.bones[bone.id].state.tr :
+        { angle: 0, sx: 1, sy: 1, tx: 0, ty: 0 };
+
+      mat2d.translate(transform, transform, [bone.tr.tx + anim.tx, bone.tr.ty + anim.ty, 0]);
+      mat2d.rotate(transform, transform, (bone.tr.angle + anim.angle) * Math.PI / 180);
+      mat2d.scale(transform, transform, [bone.tr.sx * anim.sx, bone.tr.sy * anim.sy, 1]);
 
       transforms[bone.id] = transform;
       for (const child of bone.children)
@@ -396,12 +433,14 @@ export class CardImageRenderer {
         }
       }
 
-      return vec2.transformMat2d(pt, pt, transforms[boneId]);
+      vec2.transformMat2d(pt, pt, transforms[boneId]);
+
+      return pt;
     }
 
     for (const { slotId, bone, skin, tint } of this.skeleton.slots) {
       const mat = transforms[bone.id];
-      const material = this.meshs[skin.id].material as Material;
+      const material = this.meshs[skin.id].material as MeshBasicMaterial;
       const geom = this.meshs[skin.id].geometry as Geometry;
 
       if (this.animation.slots[slotId]) {
