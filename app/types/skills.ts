@@ -99,6 +99,7 @@ export namespace SkillPowerUp {
 }
 
 export enum SkillKinds {
+  Unknown = 'unknown',
   ActiveTurns = 'active-turns',
   DamageEnemy = 'damage-enemy',
   Vampire = 'vampire',
