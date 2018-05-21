@@ -226,6 +226,6 @@ export namespace Skill {
   }
   export interface VoidEnemyBuff extends Skill {
     kind: SkillKinds.VoidEnemyBuff;
-    buff: 'attr-absorb' | 'damage-absorb';
+    buffs: ('attr-absorb' | 'damage-absorb')[];
   }
 }

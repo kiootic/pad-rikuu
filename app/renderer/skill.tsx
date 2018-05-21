@@ -471,15 +471,14 @@ function renderComplex(_skill: Skill) {
     }
     case SkillKinds.VoidEnemyBuff: {
       const skill = _skill as Skill.VoidEnemyBuff;
-      let buff;
-      switch (skill.buff) {
-        case 'attr-absorb': buff = 'Attribute damage absorb'; break;
-        case 'damage-absorb': buff = 'Damage Absorb'; break;
-      }
-
       return <Fragment>
-        <span className={css.kind}>Void buff </span>
-        <span className={css.status}>{buff}</span>
+        <span className={css.kind}>Void buffs </span>
+        {skill.buffs.map(buff => <span className={css.status} key={buff}>{
+          {
+            'attr-absorb': 'Attribute damage absorb',
+            'damage-absorb': 'Damage absorb',
+          }[buff]
+        }</span>)}
       </Fragment>;
     }
     case SkillKinds.ChangeAttribute: {

@@ -173,8 +173,8 @@ function changeAttr(target: Skill.ChangeAttribute['target'], attr: Attrs): Skill
 function gravity(value: SkillValue): Skill.WithValue {
   return { kind: SkillKinds.Gravity, value };
 }
-function voidEnemyBuff(buff: Skill.VoidEnemyBuff['buff']): Skill.VoidEnemyBuff {
-  return { kind: SkillKinds.VoidEnemyBuff, buff };
+function voidEnemyBuff(buffs: string[]): Skill.VoidEnemyBuff {
+  return { kind: SkillKinds.VoidEnemyBuff, buffs: buffs as Skill.VoidEnemyBuff['buffs'] };
 }
 
 function skillBoost(value: number): Skill.WithValue<number> { return { kind: SkillKinds.SkillBoost, value }; }
@@ -429,7 +429,10 @@ const _createParsers = (parser: SkillParser): { [type: number]: (...params: numb
   },
   [172]: () => setOrbState(null, 'unlocked'),
   [173]: (turns, attrAbsorb, _, damageAbsorb) => activeTurns(turns, voidEnemyBuff(
-    attrAbsorb ? 'attr-absorb' : 'damage-absorb'
+    [
+      attrAbsorb && 'attr-absorb',
+      damageAbsorb && 'damage-absorb'
+    ].filter(Boolean)
   )),
   [175]: (series1, series2, series3, hp, atk, rcv) => powerUp(null, null, p.mul({ hp, atk, rcv }), c.compo('series', [series1, series2, series3].filter(Boolean))),
 
