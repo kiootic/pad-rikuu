@@ -23,7 +23,7 @@ export class IconDB {
   private iconSets = new Map<number, Deferred<HTMLImageElement>>();
 
   public getIcon: (id: number) => CardIcon = createTransformer(id => {
-    const realId = id >= 100000 ? id - 100000 : id;
+    const realId = id % 100000;
     const { id: setId, col, row } = IconRenderer.instance.getIconSet(realId);
     let setTex = this.iconSets.get(setId);
     return setTex && setTex.status === DeferredStatus.Fulfilled ? {

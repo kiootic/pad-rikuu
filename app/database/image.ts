@@ -33,7 +33,8 @@ export class ImageDB {
   private images: Map<string, DBEntry> = null;
 
   public resolve(type: string, id: number): Entry {
-    const key = `${type}_${padStart(id.toString(), 3, '0')}`;
+    const realId = type === 'mons' ? id % 100000 : id;
+    const key = `${type}_${padStart(realId.toString(), 3, '0')}`;
     const entry = this.images.get(key);
     if (!entry)
       throw new Error(`no image with id '${key}'`);
