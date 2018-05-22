@@ -8,7 +8,7 @@ import { IconSize } from 'app/renderer/icon';
 import { CardIcon } from 'app/components/cardIcon';
 import { RecyclingGrid } from 'app/components/recyclingGrid';
 import css from 'styles/pages/main.scss';
-import { observable, action } from 'mobx';
+import { observable, action, autorun } from 'mobx';
 
 const NumCardPerRow = 10;
 
@@ -22,9 +22,18 @@ export default class Main extends React.Component {
   private readonly store = Store.instance;
   private readonly _state = this.store.getState(this, MainState);
 
+  private cards: any[];
+  private cardsReactionDisposer = autorun(() => {
+    this.cards = this.store.gameDB.cards && this.store.gameDB.cards.filter(card => card.id < 100000);
+  });
+
   constructor(props: any) {
     super(props);
     this.renderCard = this.renderCard.bind(this);
+  }
+
+  componentWillUnmount() {
+    this.cardsReactionDisposer();
   }
 
   @action.bound
@@ -33,12 +42,11 @@ export default class Main extends React.Component {
     this._state.scrollLeft = scroll.scrollLeft;
   }
 
-
   private renderCard({ key, rowIndex, columnIndex, style }: GridCellProps) {
     const index = rowIndex * NumCardPerRow + columnIndex;
-    if (index >= this.store.gameDB.cards.length) return null;
+    if (index >= this.cards.length) return null;
 
-    const card = this.store.gameDB.cards[index];
+    const card = this.cards[index];
     if (card.isEmpty) return null;
 
     return <CardIcon id={card.id} key={key} style={style} />
@@ -50,7 +58,7 @@ export default class Main extends React.Component {
         <AutoSizer>{({ width, height }) =>
           <RecyclingGrid width={width} height={height} className={css.cardGrid}
             scrollTop={this._state.scrollTop} scrollLeft={this._state.scrollLeft}
-            rowHeight={IconSize} rowCount={Math.ceil(this.store.gameDB.cards.length / NumCardPerRow)}
+            rowHeight={IconSize} rowCount={Math.ceil(this.cards.length / NumCardPerRow)}
             columnWidth={IconSize} columnCount={NumCardPerRow} overscanRowCount={0}
             cellRenderer={this.renderCard}
             onScroll={this.onScroll}>

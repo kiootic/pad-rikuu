@@ -23,8 +23,11 @@ export default class CardInfo extends React.Component<CardInfoProps> {
   render() {
     return Page(() => {
       const id = Number(this.props.url.query['id']);
-      const prev = maxBy(this.store.gameDB.cards.filter(card => card.id < id && !card.isEmpty), card => card.id);
-      const next = minBy(this.store.gameDB.cards.filter(card => card.id > id && !card.isEmpty), card => card.id);
+      function altSection(id: number) {
+        return Math.floor(id / 100000);
+      }
+      const prev = maxBy(this.store.gameDB.cards.filter(card => card.id < id && !card.isEmpty && altSection(card.id) === altSection(id)), card => card.id);
+      const next = minBy(this.store.gameDB.cards.filter(card => card.id > id && !card.isEmpty && altSection(card.id) === altSection(id)), card => card.id);
 
       const prevLink = <a className={css.nav}><i className="fa fa-angle-double-left" /></a>;
       const nextLink = <a className={css.nav}><i className="fa fa-angle-double-right" /></a>;
