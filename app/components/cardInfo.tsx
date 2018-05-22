@@ -13,6 +13,7 @@ import { SkillParser } from 'app/parser/skill';
 import { renderSkills } from "app/renderer/skill";
 import { CardImage } from 'app/components/cardImage';
 import { Popup } from 'app/components/popup';
+import { EvoGraph } from 'app/components/card/evoGraph';
 
 export interface CardInfoProps {
   id: number;
@@ -84,14 +85,14 @@ export class CardInfo extends React.Component<CardInfoProps> {
       <section className={css.picture}>
         <CardImage id={this.id} />
         <div className={css.awakenings}>
-          <div className={css.col}>{this.card.awakenings.map((id: number) =>
-            <Asset className={css.awakening} assetKey={`awakening-${id}`} />
+          <div className={css.col}>{this.card.awakenings.map((id: number, i: number) =>
+            <Asset key={i} className={css.awakening} assetKey={`awakening-${id}`} />
           )}</div>
           {
             this.card.superAwakenings.length === 0 ? null : <div className={css.col}>
               <Popup header={<Asset className={css.awakening} assetKey='awakening-unknown' />}>
-                <div className={css.superAwakenings}>{this.card.superAwakenings.map((id: number) =>
-                  <Asset className={css.awakening} assetKey={`awakening-${id}`} />
+                <div className={css.superAwakenings}>{this.card.superAwakenings.map((id: number, i: number) =>
+                  <Asset key={i} className={css.awakening} assetKey={`awakening-${id}`} />
                 )}</div>
               </Popup>
             </div>
@@ -196,6 +197,9 @@ export class CardInfo extends React.Component<CardInfoProps> {
           !!leaderSkill.id && renderSkills(new SkillParser(this.store.gameDB.skills).parse(leaderSkill.id))
         }
       </section>
-    </main>
+      <section className={css.evoGraph}>
+        <EvoGraph id={this.card.id} />
+      </section>
+    </main>;
   }
 }

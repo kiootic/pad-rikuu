@@ -8,6 +8,7 @@ import { Canvas } from 'app/components/canvas';
 
 export interface CardProps {
   id: number;
+  className?: string;
   scale?: number;
   style?: CSSProperties;
   link?: boolean;
@@ -30,23 +31,24 @@ export class CardIcon extends React.Component<CardProps> {
     const icon = this.store.iconDB.getIcon(id);
     if (!icon) return;
 
-    const size = IconSize * (this.props.scale || 1);
-    context.drawImage(icon.atlas, icon.x, icon.y, IconSize, IconSize, 0, 0, size, size);
+    context.drawImage(icon.atlas, icon.x, icon.y, IconSize, IconSize, 0, 0, IconSize, IconSize);
   }
 
   render() {
     const size = IconSize * (this.props.scale || 1);
     const style = {
       width: size, height: size,
+      transform: `scale(${this.props.scale || 1})`,
+      transformOrigin: 'top left',
       ...this.props.style
     };
 
     let content: JSX.Element;
     if (!this.store.iconDB.getIcon(this.props.id))
-      content = <div className={css.loading} style={style}><div /></div>;
+      content = <div style={style} className={this.props.className}><div className={css.loading} /></div>;
     else
-      content = <div style={style}>
-        <Canvas render={this.renderIcon} width={size} height={size} data={this.props.id} />
+      content = <div style={style} className={this.props.className}>
+        <Canvas render={this.renderIcon} width={IconSize} height={IconSize} data={this.props.id} />
       </div>;
 
     if (this.props.link === false) return content;
