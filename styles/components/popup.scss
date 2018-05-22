@@ -1,0 +1,22 @@
+.container {
+  position: relative;
+
+  >.header {
+    cursor: pointer;
+  }
+  >.popup {
+    position: absolute;
+    visibility: hidden;
+
+    &.left {
+      right: 0;
+    }
+    &.right {
+      left: 0;
+    }
+  }
+
+  &:hover>.popup {
+    visibility: visible;
+  }
+}

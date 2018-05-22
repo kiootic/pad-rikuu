@@ -14,8 +14,33 @@
   }
 
   .picture {
-    line-height: 0;
     width: auto;
+    position: relative;
+
+    .awakenings {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: row-reverse;
+      .col {
+        display: flex;
+        flex-direction: column;
+      }
+      .awakening {
+        margin: 4px;
+        user-select: none;
+      }
+      .superAwakenings {
+        background: #303030;
+        border: solid 1px #808080;
+        padding: 2px;
+        margin-right: 4px;
+
+        display: flex;
+        flex-direction: row;
+      }
+    }
   }
 
   .summary {

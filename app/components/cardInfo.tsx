@@ -12,6 +12,7 @@ import { computeValue, Curve } from 'app/utils/curve';
 import { SkillParser } from 'app/parser/skill';
 import { renderSkills } from "app/renderer/skill";
 import { CardImage } from 'app/components/cardImage';
+import { Popup } from 'app/components/popup';
 
 export interface CardInfoProps {
   id: number;
@@ -82,6 +83,20 @@ export class CardInfo extends React.Component<CardInfoProps> {
     return <main className={[css.main, this.props.className].join(' ')}>
       <section className={css.picture}>
         <CardImage id={this.id} />
+        <div className={css.awakenings}>
+          <div className={css.col}>{this.card.awakenings.map((id: number) =>
+            <Asset className={css.awakening} assetKey={`awakening-${id}`} />
+          )}</div>
+          {
+            this.card.superAwakenings.length === 0 ? null : <div className={css.col}>
+              <Popup header={<Asset className={css.awakening} assetKey='awakening-unknown' />}>
+                <div className={css.superAwakenings}>{this.card.superAwakenings.map((id: number) =>
+                  <Asset className={css.awakening} assetKey={`awakening-${id}`} />
+                )}</div>
+              </Popup>
+            </div>
+          }
+        </div>
       </section>
       <section className={css.summary}>
         <CardIcon id={this.id} link={false} />
