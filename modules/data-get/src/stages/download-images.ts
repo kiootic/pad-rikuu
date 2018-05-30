@@ -1,0 +1,88 @@
+import Axios from 'axios';
+import { padStart } from 'lodash';
+import { allWithProgress, formatJson, mkdirIfExists, queueWork, urlSegments, writeTo } from '../common';
+import { decodeTex } from '../texture';
+
+/* tslint:disable:no-bitwise */
+
+interface Entry {
+  key: string;
+  isCards: boolean;
+  id: number;
+  width: number;
+  height: number;
+  lastUpdate: number;
+
+  frames: number;
+  files?: string[];
+}
+
+export async function downloadImages(rootPath: string, dataUrl: string) {
+  console.log(`downloading images: ${dataUrl}`);
+  const v = urlSegments(dataUrl).find(seg => seg.startsWith('mon'))!;
+  const basePath = mkdirIfExists(rootPath, 'images', v);
+  writeTo(Buffer.from(v, 'utf8'), rootPath, 'images', 'current');
+  if (!basePath) {
+    console.log('up to date.');
+    return true;
+  }
+
+  mkdirIfExists(basePath, 'raw');
+  mkdirIfExists(basePath, 'cards');
+  mkdirIfExists(basePath, 'mons');
+
+  const indexData: Buffer = await Axios.get('extlist.bin', {
+    baseURL: dataUrl,
+    responseType: 'arraybuffer'
+  }).then(resp => resp.data);
+  writeTo(indexData, basePath, 'extlist.bin');
+
+  const numMons = indexData.readUInt32LE(0);
+  const numCards = indexData.readUInt32LE(4);
+  const sig = indexData.readUInt32LE(8);
+  if (sig !== 0x31545845) {  // EXT1
+    console.error('invalid extlist.bin signature');
+    return false;
+  }
+  console.log(`monsters: ${numMons}, cards: ${numCards}`);
+
+  const entries: Entry[] = [];
+  for (let i = 0; i < numMons + numCards; i++) {
+    const flags = indexData.readUInt16LE(0x10 + i * 24 + 0);
+    const isCards = (flags & 0x4000) !== 0;
+    const id = flags & ~0x4000;
+    if (id === 0) continue;
+
+    const width = indexData.readUInt16LE(0x10 + i * 24 + 6);
+    const height = indexData.readUInt16LE(0x10 + i * 24 + 8);
+    const frames = indexData.readUInt16LE(0x10 + i * 24 + 10);
+    const lastUpdate = indexData.readUInt32LE(0x10 + i * 24 + 20);
+    const key = `${isCards ? 'cards' : 'mons'}_${padStart(id.toString(), 3, '0')}`;
+    entries.push({ key, isCards, id, width, height, frames, lastUpdate });
+  }
+  writeTo(formatJson(entries), basePath, 'extlist.json');
+
+  const tasks = entries.map(entry => queueWork(async () => {
+    const resp = await Axios.get(`${entry.key}.bc`, {
+      baseURL: dataUrl,
+      responseType: 'arraybuffer'
+    });
+    const data = resp.data;
+    await writeTo(data, basePath, 'raw', `${entry.key}.bc`);
+    return data;
+  }).then(async data => {
+    try {
+      const texs = await decodeTex(data, entry);
+      for (const name of Object.keys(texs)) {
+        writeTo(texs[name], basePath, entry.isCards ? 'cards' : 'mons', name);
+      }
+      entry.files = Object.keys(texs);
+    } catch (err) {
+      console.error(`\nfailed to decode ${entry.key}: `, err);
+    }
+  }));
+  await allWithProgress(tasks, (done, total) => process.stdout.write(`downloading: ${done}/${total}`));
+  writeTo(formatJson(entries), basePath, 'extlist.json');
+
+  return true;
+}
