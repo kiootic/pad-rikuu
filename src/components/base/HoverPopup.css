@@ -3,7 +3,11 @@
   cursor: pointer;
 }
 
-.HoverPopup-popup-root, .HoverPopup-popup {
+.HoverPopup-popup-root {
+  pointer-events: none;
+}
+.HoverPopup-popup {
+  pointer-events: auto;
   position: absolute;
 }
 
@@ -13,5 +17,11 @@
 }
 .HoverPopup-popup-right {
   left: 0;
+  transform-origin: top left;
+}
+.HoverPopup-popup-pointer {
+  pointer-events: none;
+  margin-left: 16px;
+  margin-top: 16px;
   transform-origin: top left;
 }

@@ -56,7 +56,7 @@ export class CardDetails extends React.Component<CardDetailsProps> {
             {
               card.superAwakenings.length === 0 ? null : <div className="CardDetails-awakenings-col">
                 <HoverPopup
-                  direction="left"
+                  anchor="left"
                   header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}
                 >
                   <div className="CardDetails-awakenings-super">{

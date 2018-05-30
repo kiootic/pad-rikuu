@@ -1,6 +1,7 @@
+import { Typography } from '@material-ui/core';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { AppLink, Canvas } from 'src/components/base';
+import { AppLink, Asset, Canvas, HoverPopup } from 'src/components/base';
 import { IconSize } from 'src/renderer/CardIconRenderer';
 import { Store } from 'src/store';
 import { bound, store } from 'src/utils';
@@ -36,8 +37,27 @@ export class CardIcon extends React.Component<CardIconProps> {
         <Canvas width={IconSize} height={IconSize} render={this.renderIcon} />
       </div>;
 
+    const card = this.store.gameData.cards.find(c => c.id === this.props.id);
     if (this.props.link === false) return content;
-    else return <AppLink to={`/cards/${this.props.id}`}>{content}</AppLink>;
+    else {
+      const link = <AppLink to={`/cards/${this.props.id}`}>{content}</AppLink>;
+      if (!card) return link;
+
+      return (
+        <HoverPopup anchor="pointer" header={link}>
+          <Typography className="CardIcon-info">
+            <span className="CardIcon-info-header">
+              <Typography variant="caption" className="CardIcon-info-no">No. {card.id}</Typography>
+              <span>{
+                card.types.filter(type => type !== -1)
+                  .map((type, i) => <Asset assetId={`type-${type}`} key={i} />)
+              }</span>
+            </span>
+            {card.name}
+          </Typography>
+        </HoverPopup>
+      );
+    }
   }
 
   @bound
@@ -45,9 +65,9 @@ export class CardIcon extends React.Component<CardIconProps> {
     const context = canvas.getContext('2d')!;
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-     const icon = this.store.images.getIcon(this.props.id);
-     if (!icon) return;
+    const icon = this.store.images.getIcon(this.props.id);
+    if (!icon) return;
 
-     context.drawImage(icon.image, icon.x, icon.y, IconSize, IconSize, 0, 0, IconSize, IconSize);
+    context.drawImage(icon.image, icon.x, icon.y, IconSize, IconSize, 0, 0, IconSize, IconSize);
   }
 }

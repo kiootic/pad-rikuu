@@ -76,7 +76,10 @@ export class CardEvolution extends React.Component<CardEvolutionProps> {
       return (
         <div className="CardEvolution-node">
           <div className="CardEvolution-card">
-            <CardIcon id={node.id} className={node.id === card.id ? 'CardEvolution-card-active' : ''} />
+            <CardIcon
+              id={node.id} link={node.id !== card.id}
+              className={node.id === card.id ? 'CardEvolution-card-active' : ''}
+            />
           </div>
           {
             node.edges.length > 0 && <div className="CardEvolution-children-edges">

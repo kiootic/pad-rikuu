@@ -8,7 +8,7 @@ import './HoverPopup.css';
 export interface HoverPopupProps {
   className?: string;
   header: React.ReactElement<any>;
-  direction?: 'left' | 'right';
+  anchor?: 'left' | 'right' | 'pointer';
 }
 
 @observer
@@ -19,6 +19,9 @@ export class HoverPopup<T> extends React.Component<HoverPopupProps> {
   @observable
   private popupOpened = false;
 
+  @observable private mouseX = 0;
+  @observable private mouseY = 0;
+
   private headerElem: HTMLElement | null;
   private elem = document.createElement('div');
 
@@ -28,19 +31,31 @@ export class HoverPopup<T> extends React.Component<HoverPopupProps> {
 
   public componentWillUnmount() {
     this.elem.remove();
+    document.body.removeEventListener('pointermove', this.onPointerMove);
   }
 
   public render() {
     if (this.popupOpened && !this.elem.parentElement) {
       document.body.appendChild(this.elem);
-    } else if (!this.popupOpened) {
+      document.body.addEventListener('pointermove', this.onPointerMove);
+    } else if (!this.popupOpened && this.elem.parentElement) {
       this.elem.remove();
+      document.body.removeEventListener('pointermove', this.onPointerMove);
     }
 
     if (this.popupOpened && this.headerElem) {
-      const rect = this.headerElem.getBoundingClientRect();
-      const left = window.pageXOffset + (this.props.direction === 'left' ? rect.right : rect.left);
-      const top = window.pageYOffset + rect.bottom;
+      let left;
+      let top;
+      if (this.props.anchor === 'pointer') {
+        left = this.mouseX;
+        top = this.mouseY;
+        this.elem.style.position = 'fixed';
+      } else {
+        const rect = this.headerElem.getBoundingClientRect();
+        left = window.pageXOffset + (this.props.anchor === 'left' ? rect.right : rect.left);
+        top = window.pageYOffset + rect.bottom;
+        this.elem.style.position = 'absolute';
+      }
       this.elem.style.left = `${left}px`;
       this.elem.style.top = `${top}px`;
     }
@@ -52,7 +67,7 @@ export class HoverPopup<T> extends React.Component<HoverPopupProps> {
         {this.props.header}
         {this.popupOpened && ReactDOM.createPortal(
           <Grow in={this.opened} onExited={this.exit}>
-            <Paper elevation={8} className={`HoverPopup-popup HoverPopup-popup-${this.props.direction || 'right'}`}>
+            <Paper elevation={8} className={`HoverPopup-popup HoverPopup-popup-${this.props.anchor || 'right'}`}>
               {this.props.children}
             </Paper>
           </Grow>, this.elem)
@@ -62,9 +77,20 @@ export class HoverPopup<T> extends React.Component<HoverPopupProps> {
   }
 
   @action.bound
-  private open() { this.opened = true; this.popupOpened = true; }
+  private open(e : React.MouseEvent<HTMLElement>) {
+     this.opened = true; 
+     this.popupOpened = true;
+     this.mouseX = e.clientX;
+     this.mouseY = e.clientY;
+   }
   @action.bound
   private close() { this.opened = false; }
   @action.bound
   private exit() { this.popupOpened = false; }
+
+  @action.bound
+  private onPointerMove(e: MouseEvent) {
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
+  }
 }

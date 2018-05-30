@@ -57,7 +57,7 @@ export class CardSkill extends React.Component<CardSkillProps> {
         <Expander header="Skill Data">
           <div className="CardSkill-data">
             <div className="CardSkill-skill-list">{this.parsedSkills.map(renderSkillEntry)}</div>
-            <HoverPopup className="CardSkill-raw-icon" direction="left" header={<Icon>code</Icon>}>
+            <HoverPopup className="CardSkill-raw-icon" anchor="left" header={<Icon>code</Icon>}>
               <div className="CardSkill-raw-data">{JSON.stringify(this.parsedSkills, null, 4)}</div>
             </HoverPopup>
           </div>
@@ -327,8 +327,8 @@ function renderSkill(skill: Skill): React.ReactNode {
                 case 'gen':
                   return (
                     <span key={i}>
-                      {renderOrbs(change.exclude).map(orb => (
-                        <AssetBox className="CardSkill-icon-box">
+                      {renderOrbs(change.exclude).map((orb, j) => (
+                        <AssetBox className="CardSkill-icon-box" key={j}>
                           {orb}
                           <Asset assetId="overlay-cross" className="CardSkill-icon" />
                         </AssetBox>

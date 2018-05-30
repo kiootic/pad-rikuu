@@ -14,3 +14,18 @@
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='); 
   content: '';
 }
+
+.CardIcon-info {
+  padding: 8px;
+  width: max-content;
+}
+.CardIcon-info-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.CardIcon-info-no {
+  width: auto;
+  margin-right: 32px !important;
+}
