@@ -1,0 +1,68 @@
+.CardEvolution-node {
+  width: fit-content;
+  height: fit-content;
+  align-self: center;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.CardEvolution-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.CardEvolution-card-active {
+  background: #808080;
+}
+
+.CardEvolution-children-edges {
+  display: flex;
+  flex-direction: column;
+}
+.CardEvolution-children-edges::before {
+  content: '';
+  height: 8px;
+  margin-left: 50%;
+  border-left: solid 4px #d0d0d0;
+}
+
+.CardEvolution-children {
+  display: flex;
+  flex-flow: row wrap;
+}
+.CardEvolution-children > .CardEvolution-child:first-child:before {
+  margin-left: 50%;
+}
+.CardEvolution-children > .CardEvolution-child:last-child:not(:only-child):before {
+  margin-right: calc(50% - 4px);
+}
+.CardEvolution-children > .CardEvolution-child:only-child:before {
+  margin-left: 50%;
+  width: 4px;
+}
+
+.CardEvolution-child {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+.CardEvolution-child:before {
+  content: '';
+  border-top: solid 4px #d0d0d0;
+}
+
+.CardEvolution-type {
+  padding: 4px 8px;
+  min-height: 32px;
+  margin-left: 50%;
+  border-left: solid 4px #d0d0d0;
+}
+
+.CardEvolution-materials {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0 16px;
+}

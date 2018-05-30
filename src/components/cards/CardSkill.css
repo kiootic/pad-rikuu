@@ -1,0 +1,54 @@
+.CardSkill-header {
+  display: flex;
+  flex-direction: row;
+}
+
+.CardSkill-header-item {
+  margin-left: 16px !important;
+}
+
+.CardSkill-spacer {
+  flex: 1;
+}
+
+.CardSkill-skill-entry {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.CardSkill-icon, .CardSkill-icon-box {
+  vertical-align: middle;
+  margin-left: 4px;
+  margin-right: 8px;
+}
+.CardSkill-icon-box > .CardSkill-icon {
+  margin: initial;
+}
+
+.CardSkill-stats {
+  font-weight: bold;
+}
+
+.CardSkill-item-list {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.CardSkill-data {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.CardSkill-raw-icon {
+  margin: 8px;
+}
+.CardSkill-raw-data {
+  white-space: pre;
+  font-family: monospace;
+  padding: 16px;
+  min-width: 400px;
+  max-height: 300px;
+  overflow-y: auto;
+}

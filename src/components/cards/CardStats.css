@@ -1,0 +1,18 @@
+.CardStats-root {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+
+.CardStats-entry {
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+}
+
+.CardStats-header {
+  font-weight: bold;
+}

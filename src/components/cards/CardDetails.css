@@ -1,0 +1,81 @@
+.CardDetails-root {
+  display: flex;
+  flex-direction: column;
+}
+
+.CardDetails-section {
+  padding: 16px;
+  margin: 16px;
+}
+
+.CardDetails-heading {
+  text-transform: uppercase;
+  margin-bottom: 16px !important;
+}
+
+.CardDetails-section.CardDetails-image {
+  width: fit-content;
+  align-self: center;
+}
+.CardDetails-section.CardDetails-image > section {
+  position: relative;
+}
+
+.CardDetails-awakenings {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: row-reverse;
+}
+.CardDetails-awakenings-col {
+  display: flex;
+  flex-direction: column;
+}
+.CardDetails-awakening {
+  margin: 4px;
+  user-select: none;
+}
+.CardDetails-awakenings-super {
+  display: flex;
+  flex-direction: row;
+  padding: 4px;
+}
+
+.CardDetails-icon {
+  margin: 0 4px;
+}
+
+.CardDetails-section.CardDetails-summary > section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.CardDetails-summary-basic {
+  margin: 0 16px;
+  flex: 1;
+}
+.CardDetails-summary-basic > * {
+  margin: 8px 0;
+}
+
+.CardDetails-summary-extended {
+  display: grid;
+  grid-template-columns: minmax(100px, max-content) minmax(150px, max-content);
+  row-gap: 8px;
+  column-gap: 16px;
+}
+.CardDetails-summary-extended > p {
+  margin: 0;
+}
+.CardDetails-summary-extended > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.CardDetails-evolution > section {
+  display: flex;
+  flex-direction: column;
+}

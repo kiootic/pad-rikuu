@@ -1,0 +1,19 @@
+.AssetBox-root {
+  display: inline-grid;
+  grid-template: 'x';
+  position: relative;
+}
+
+.AssetBox-root > * {
+  grid-area: x;
+}
+.AssetBox-root > :not(.AssetBox-title) {
+  user-select: none;
+  pointer-events: none;
+}
+
+.AssetBox-title {
+  grid-area: x;
+  width: 100%;
+  height: 100%;
+}

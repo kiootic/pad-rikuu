@@ -1,0 +1,17 @@
+.HoverPopup-root {
+  position: relative;
+  cursor: pointer;
+}
+
+.HoverPopup-popup-root, .HoverPopup-popup {
+  position: absolute;
+}
+
+.HoverPopup-popup-left {
+  right: 0;
+  transform-origin: top right;
+}
+.HoverPopup-popup-right {
+  left: 0;
+  transform-origin: top left;
+}

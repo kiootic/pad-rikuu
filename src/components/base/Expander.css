@@ -1,0 +1,16 @@
+.Expander-root {
+  display: flex;
+  flex-direction: column;
+}
+
+.Expander-header {
+  width: 100%;
+  display: flex !important;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.Expander-header:before { margin-right: 16px; }
+.Expander-header.Expander-closed:before { content: '▼'; }
+.Expander-header.Expander-opened:before { content: '▲'; }
+
+.Expander-content.Expander-closed { display: none; }
