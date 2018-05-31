@@ -29,8 +29,8 @@ export class AssetStore extends BaseStore {
   protected async doLoad() {
     await Promise.all(assetNames.map(async (name) => {
       const [image, metadata] = await Promise.all([
-        fetchImage(`/data/assets/${name}.png`),
-        fetch(`/data/assets/${name}.json`).then(resp => resp.json())
+        fetchImage(`/assets/${name}.png`),
+        fetch(`/assets/${name}.json`).then(resp => resp.json())
       ]);
       this.onLoaded(image, metadata);
     }));

@@ -17,7 +17,6 @@ interface DBEntry {
 }
 
 export interface Entry {
-  readonly basePath: string;
   readonly width: number;
   readonly height: number;
   readonly frames: number;
@@ -39,7 +38,6 @@ export class ImageStore extends BaseStore {
       throw new Error(`no image with id '${key}'`);
 
     return {
-      basePath: `/data/images/${entry.isCards ? 'cards' : 'mons'}`,
       width: entry.width,
       height: entry.height,
       frames: entry.frames,
@@ -48,12 +46,12 @@ export class ImageStore extends BaseStore {
   }
 
   public async fetchImage(entry: Entry, file?: string) {
-    const path = `${entry.basePath}/${file || entry.files[0]}`;
+    const path = `/data/images/${file || entry.files[0]}`;
     return await fetchImage(path);
   }
 
   public async fetchJson(entry: Entry, file?: string) {
-    const path = `${entry.basePath}/${file || entry.files[0]}`;
+    const path = `/data/images/${file || entry.files[0]}`;
     return await fetch(path).then(resp => resp.json());
   }
 
