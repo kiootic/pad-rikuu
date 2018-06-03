@@ -1,8 +1,8 @@
 import Button, { ButtonProps } from '@material-ui/core/Button';
 import * as React from 'react';
-import { Link, LinkProps } from 'react-router-dom';
+import { NavLink, NavLinkProps } from 'react-router-dom';
 
-export interface AppLinkProps extends LinkProps {
+export interface AppLinkProps extends NavLinkProps {
   disabled?: boolean;
 }
 
@@ -13,9 +13,9 @@ export function AppLink(props: AppLinkProps) {
     return <a {...newProps} />;
   }
   else
-    return <Link {...props} />;
+    return <NavLink {...props} />;
 }
 
 export function AppLinkButton(props: ButtonProps & AppLinkProps) {
-  return <Button component={AppLink} {...props as any} />;
+  return <Button component={AppLink} {...props as any} disableRipple={true} />;
 }

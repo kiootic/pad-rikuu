@@ -1,5 +1,6 @@
 import { padStart } from 'lodash';
 import { action, observable } from 'mobx';
+import { Card } from 'src/models';
 import { getIconSet, IconSize, renderIconSet } from 'src/renderer/CardIconRenderer';
 import { BaseStore } from 'src/store/BaseStore';
 import { AtlasImage, fetchImage, setImmediate, transformer } from 'src/utils';
@@ -31,7 +32,7 @@ export class ImageStore extends BaseStore {
   private readonly icons = new Map<number, false | HTMLImageElement>();
 
   public resolve(type: string, id: number): Entry {
-    const realId = type === 'mons' ? id % 100000 : id;
+    const realId = type === 'mons' ? Card.mainId(id) : id;
     const key = `${type}_${padStart(realId.toString(), 3, '0')}`;
     const entry = this.images.get(key);
     if (!entry)
@@ -57,7 +58,7 @@ export class ImageStore extends BaseStore {
 
   @transformer
   public getIcon(id: number) {
-    const realId = id % 100000;
+    const realId = Card.mainId(id);
     const { id: setId, col, row } = getIconSet(realId);
 
     if (!this.icons.has(setId))

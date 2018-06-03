@@ -34,10 +34,29 @@ export interface Card {
   activeSkillId: number;
   leaderSkillId: number;
 
-  enemy: any;
+  enemy: {
+    countdown: number;
+    hp: Curve;
+    atk: Curve;
+    def: Curve;
+    maxLevel: number;
+    coin: number;
+    exp: number;
+    skills: Array<{
+      id: number;
+      ai: number;
+      rnd: number;
+    }>;
+  };
 }
 
 export namespace Card {
+  export function mainId(arg: Card | number) {
+    if (typeof arg === 'object')
+      arg = arg.id;
+    return Math.floor(arg % 100000);
+  }
+
   export function section(arg: Card | number) {
     if (typeof arg === 'object')
       arg = arg.id;

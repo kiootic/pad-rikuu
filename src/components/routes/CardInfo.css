@@ -10,11 +10,46 @@
   order: 0;
 }
 
-.CardInfo-details {
+.CardInfo-content {
   width: 900px;
   order: 1;
+  position: relative;
 }
 
 .CardInfo-next {
   order: 2;
+}
+
+.CardInfo-options {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  padding: 4px;
+  border: 1px solid #808080;
+  line-height: 0;
+}
+
+.CardInfo-option-list {
+  margin: 0;
+  padding: 0;
+  width: max-content;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.CardInfo-option-list > li {
+  list-style: none;
+}
+
+.CardInfo-option-list > li > * {
+  width: 100%;
+  display: block;
+}
+
+.CardInfo-option-title {
+  margin: 8px;
+  text-transform: uppercase;
 }

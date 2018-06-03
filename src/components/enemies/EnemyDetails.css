@@ -1,0 +1,52 @@
+.EnemyDetails-root {
+  display: flex;
+  flex-direction: column;
+}
+
+.EnemyDetails-section {
+  padding: 16px;
+  margin: 16px;
+}
+
+.EnemyDetails-heading {
+  text-transform: uppercase;
+  margin-bottom: 16px !important;
+}
+
+.EnemyDetails-section.EnemyDetails-image {
+  width: fit-content;
+  align-self: center;
+}
+
+.EnemyDetails-icon {
+  margin: 0 4px;
+}
+
+.EnemyDetails-section.EnemyDetails-summary > section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.EnemyDetails-summary-basic {
+  margin: 0 16px;
+  flex: 1;
+}
+.EnemyDetails-summary-basic > * {
+  margin: 8px 0;
+}
+
+.EnemyDetails-summary-extended {
+  display: grid;
+  grid-template-columns: minmax(100px, max-content) minmax(150px, max-content);
+  row-gap: 8px;
+  column-gap: 16px;
+}
+.EnemyDetails-summary-extended > p {
+  margin: 0;
+}
+.EnemyDetails-summary-extended > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

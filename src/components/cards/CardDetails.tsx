@@ -4,14 +4,14 @@ import { computed } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
 import { Asset, HoverPopup } from 'src/components/base';
+import { CardEvolution } from 'src/components/cards/CardEvolution';
+import { CardIcon } from 'src/components/cards/CardIcon';
 import { CardImage } from 'src/components/cards/CardImage';
+import { CardSkill } from 'src/components/cards/CardSkill';
+import { CardStats } from 'src/components/cards/CardStats';
 import { Store } from 'src/store';
 import { store } from 'src/utils';
 import './CardDetails.css';
-import { CardEvolution } from './CardEvolution';
-import { CardIcon } from './CardIcon';
-import { CardSkill } from './CardSkill';
-import { CardStats } from './CardStats';
 
 export interface CardDetailsProps {
   id: number;
@@ -55,10 +55,7 @@ export class CardDetails extends React.Component<CardDetailsProps> {
             )}</div>
             {
               card.superAwakenings.length === 0 ? null : <div className="CardDetails-awakenings-col">
-                <HoverPopup
-                  anchor="left"
-                  header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}
-                >
+                <HoverPopup header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}>
                   <div className="CardDetails-awakenings-super">{
                     card.superAwakenings.map((id: number, i: number) =>
                       <Asset key={i} className="CardDetails-awakening" assetId={`awakening-${id}`} />

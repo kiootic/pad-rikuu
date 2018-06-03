@@ -1,0 +1,22 @@
+.EnemyStats-root {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+.EnemyStats-entry {
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+}
+
+.EnemyStats-header {
+  font-weight: bold;
+}
+
+.EnemyStats-level {
+  width: 50px !important;
+}

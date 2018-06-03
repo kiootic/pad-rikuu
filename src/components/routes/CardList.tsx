@@ -43,7 +43,7 @@ export class CardList extends React.Component<RouteComponentProps<{}>> {
   }
 
   @computed
-  private get cards() { return this.store.gameData.cards.filter(card => card.id < 100000); }
+  private get cards() { return this.store.gameData.cards.filter(card => Card.section(card.id) === 0); }
 
   @bound
   private renderCard({ key, rowIndex, columnIndex, style }: GridCellProps) {

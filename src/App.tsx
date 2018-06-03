@@ -41,7 +41,7 @@ export class App extends React.Component<AppProps> {
                     <div className="App-content">
                       <Route exact={true} path="/" render={indexRedirect} />
                       <Route exact={true} path="/cards" component={CardList} />
-                      <Route path="/cards/:id" component={CardInfo} />
+                      <Route path="/:type(cards|enemies)/:id" component={CardInfo} />
                     </div>
                   </BrowserRouter>
                 )

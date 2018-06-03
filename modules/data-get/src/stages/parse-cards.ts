@@ -67,8 +67,8 @@ function parseCard(data: any[]) {
   const numSkills = data[i++];
   card.enemy.skills = range(numSkills).map(() => ({
     id: data[i++],
-    param1: data[i++],
-    param2: data[i++]
+    ai: data[i++],
+    rnd: data[i++]
   }));
 
   const numAwakening = data[i++];
