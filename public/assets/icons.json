@@ -58,6 +58,11 @@
         "skill-gravity",
         "skill-boost",
         "skill-attack",
-        "skill-unbind"
+        "skill-unbind",
+        "status-angry",
+        "status-bind",
+        "base-skill",
+        "base-shield",
+        "status-lock-maxhp"
     ]
 }

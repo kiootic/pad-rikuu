@@ -1,0 +1,73 @@
+.EnemySkills-root {
+  padding: 0;
+}
+
+.EnemySkills-action-item {
+  list-style: none;
+  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.EnemySkills-action-ord {
+  width: 32px;
+  text-align: center;
+  margin-right: 16px;
+}
+
+.EnemySkills-action-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex: 1;
+}
+
+.EnemySkills-action-list > li {
+  list-style: none;
+}
+
+.EnemySkills-action-header {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  margin-top: 16px;
+}
+
+.EnemySkills-action-header > h3 {
+  min-width: 300px;
+}
+
+.EnemySkills-condition, .EnemySkills-prob {
+  margin-left: 32px !important;
+}
+.EnemySkills-condition:last-child, .EnemySkills-prob:last-child {
+  flex: 1;
+  text-align: right;
+  margin: initial !important;
+}
+
+.EnemySkills-action {
+  flex: 1;
+}
+.EnemySkills-action > :not(.EnemySkills-action-header) {
+  margin-left: 32px;
+}
+
+.EnemySkills-icon, .EnemySkills-icon-box {
+  vertical-align: middle;
+}
+
+.EnemySkills-damage {
+  font-weight: bold;
+}
+
+.EnemySkills-board-marks {
+  display: inline-block;
+}
+
+.EnemySkills-card-list {
+  display: inline-flex;
+  flex-direction: row;
+  vertical-align: middle;
+}

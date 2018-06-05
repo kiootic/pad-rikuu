@@ -8,6 +8,7 @@ export enum Attributes {
   Jammer = 6,
   Poison = 7,
   MPoison = 8,
+  Bomb = 9,
 }
 
 export namespace Attributes {
@@ -21,6 +22,7 @@ export namespace Attributes {
     [Attributes.Jammer]: 'Jammer',
     [Attributes.Poison]: 'Poison',
     [Attributes.MPoison]: 'Mortal Poison',
+    [Attributes.Bomb]: 'Bomb',
   };
 
   export function all() {
@@ -30,6 +32,21 @@ export namespace Attributes {
       Attributes.Wood,
       Attributes.Light,
       Attributes.Dark
+    ];
+  }
+
+  export function orbs() {
+    return [
+      Attributes.Fire,
+      Attributes.Water,
+      Attributes.Wood,
+      Attributes.Light,
+      Attributes.Dark,
+      Attributes.Heart,
+      Attributes.Jammer,
+      Attributes.Poison,
+      Attributes.MPoison,
+      Attributes.Bomb,
     ];
   }
 }
