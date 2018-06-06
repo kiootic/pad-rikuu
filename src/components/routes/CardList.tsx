@@ -36,7 +36,7 @@ export class CardList extends React.Component<RouteComponentProps<{}>> {
         <RecyclingGrid width={width} height={height} className="CardList-grid"
           rowHeight={IconSize} rowCount={Math.ceil(this._cards.length / NumCardPerRow)}
           columnWidth={IconSize} columnCount={NumCardPerRow} cellRenderer={this.renderCard}
-          onScroll={this.onScroll} scrollTop={scrollTop}
+          onScroll={this.onScroll} scrollTop={scrollTop} tabIndex={null}
         />
       }</AutoSizer>
     );

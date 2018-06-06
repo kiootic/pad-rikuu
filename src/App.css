@@ -10,13 +10,33 @@
   content: 'loading...';
 }
 
-.App-content {
-  width: 100%;
+.App-content-wrapper {
+  flex: 1;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-content {
+  flex: 1;
   display: flex;
 }
 
 .App-root {
   width: 100%;
   min-height: 100vh;
+  display: flex !important;
+  flex-flow: row wrap;
+}
+
+.App-drawer {
+  width: 240px !important;
+}
+
+.App-title {
+  margin-right: 64px !important;
+}
+
+.App-search {
+  min-width: 480px;
 }
