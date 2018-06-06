@@ -1,0 +1,132 @@
+.CardImage-root {
+  position: relative;
+  line-height: 0;
+}
+
+.CardImage-control {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  visibility: hidden;
+}
+
+.CardImage-root:hover .CardImage-control {
+  visibility: visible;
+}
+
+.CardImage-settings {
+  padding: 4px;
+  position: relative;
+}
+
+.CardImage-settings-popup {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  padding: 0 8px;
+  width: max-content;
+
+  visibility: hidden;
+}
+
+.CardImage-settings:hover .CardImage-settings-popup {
+  visibility: visible;
+}
+
+.CardImage-button {
+  margin: 4px !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.CardImage-timeline-moment {
+  display: block;
+  min-width: 40px;
+  text-align: center;
+}
+
+.CardImage-timeline-wrapper {
+  height: 32px;
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+}
+
+/* http://danielstern.ca/range.css */
+
+.CardImage-timeline {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 1px;
+}
+.CardImage-timeline:focus {
+  outline: none;
+}
+.CardImage-timeline::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 1px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 0px;
+  border: 1px solid #ffffff;
+}
+.CardImage-timeline::-webkit-slider-thumb {
+  border: 1px solid #000000;
+  height: 16px;
+  width: 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -8.5px;
+}
+.CardImage-timeline::-moz-range-track {
+  width: 100%;
+  height: 1px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0);
+  border-radius: 0px;
+  border: 1px solid #ffffff;
+}
+.CardImage-timeline::-moz-range-thumb {
+  border: 1px solid #000000;
+  height: 16px;
+  width: 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+}
+.CardImage-timeline::-ms-track {
+  width: 100%;
+  height: 1px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+.CardImage-timeline::-ms-fill-lower {
+  background: rgba(0, 0, 0, 0);
+  border: 1px solid #ffffff;
+  border-radius: 0px;
+}
+.CardImage-timeline::-ms-fill-upper {
+  background: rgba(0, 0, 0, 0);
+  border: 1px solid #ffffff;
+  border-radius: 0px;
+}
+.CardImage-timeline::-ms-thumb {
+  border: 1px solid #000000;
+  height: 16px;
+  width: 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 1px;
+}

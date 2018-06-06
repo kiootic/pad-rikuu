@@ -14,12 +14,14 @@ export type CardImageDescriptor = CardImageFrames | CardImageSpine;
 export interface CardImageFrames {
   type: 'frames';
   scene: Scene;
+  time: number;
   frames: number;
 }
 
 export interface CardImageSpine {
   type: 'spine';
   scene: Scene;
+  time: number;
   spine: SpineAnimation;
 }
 
@@ -37,6 +39,7 @@ export function makeDefaultScene(store: Store) {
   const bgImage = store.assets.lookup('card-image-bg').image;
   const geom = new PlaneGeometry(ImageSize, ImageSize);
   const bg = new Mesh(geom, new MeshBasicMaterial({ map: toTexture(bgImage), side: DoubleSide }));
+  bg.name = 'card-bg';
   bg.position.set(0, ImageSize / 2, 0);
   scene.add(bg);
   return scene;
@@ -60,6 +63,7 @@ export async function loadId(store: Store, id: number): Promise<CardImageDescrip
     return {
       type: 'frames',
       scene,
+      time: 0.3 * (entry.frames || 0),
       frames: entry.frames || 1
     };
   } else {
@@ -106,9 +110,15 @@ export async function loadId(store: Store, id: number): Promise<CardImageDescrip
     return {
       type: 'spine',
       scene,
+      time: spine.length,
       spine
     };
   }
+}
+
+export function setBgVisibility(scene: Scene, value: boolean) {
+  const bg = scene.getObjectByName('card-bg');
+  bg.visible = value;
 }
 
 export function updateScene(descriptor: CardImageDescriptor, time: number) {
