@@ -28,7 +28,7 @@ export class CardDetails extends React.Component<CardDetailsProps> {
   private get id() { return this.props.id || 0; }
 
   @computed
-  private get card() { return this.store.gameData.cards.find(card => card.id === this.id); }
+  private get card() { return this.store.gameData.getCard(this.id); }
 
   public render() {
     const card = this.card;

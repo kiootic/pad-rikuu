@@ -27,7 +27,7 @@ export class EnemyDetails extends React.Component<EnemyDetailsProps> {
   private get id() { return this.props.id || 0; }
 
   @computed
-  private get card() { return this.store.gameData.cards.find(card => card.id === this.id); }
+  private get card() { return this.store.gameData.getCard(this.id); }
 
   @observable
   private selectedLevel = 1;

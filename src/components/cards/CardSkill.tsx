@@ -30,10 +30,10 @@ export class CardSkill extends React.Component<CardSkillProps> {
   private get id() { return this.props.id || 0; }
 
   @computed
-  private get skill() { return this.store.gameData.skills.find(skill => skill.id === this.id)!; }
+  private get skill() { return this.store.gameData.getSkill(this.id)!; }
 
   @computed
-  private get parsedSkills() { return parse(this.store.gameData.skills, this.id); }
+  private get parsedSkills() { return parse(id => this.store.gameData.getSkill(id), this.id); }
 
   public render() {
     const skill = this.skill;

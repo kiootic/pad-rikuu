@@ -40,7 +40,7 @@ export class CardInfo extends React.Component<RouteComponentProps<{ type: string
 
   @computed
   private get card() {
-    return this.store.gameData.cards.find(card => card.id === this.cardMainId);
+    return this.store.gameData.getCard(this.cardMainId);
   }
 
   @computed

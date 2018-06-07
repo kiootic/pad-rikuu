@@ -30,13 +30,13 @@ export class EnemySkills extends React.Component<EnemySkillsProps> {
   private get id() { return this.props.id || 0; }
 
   @computed
-  private get card() { return this.store.gameData.cards.find(card => card.id === this.id)!; }
+  private get card() { return this.store.gameData.getCard(this.id)!; }
 
   public render() {
     if (!this.card) return null;
 
     const skills = this.card.enemy.skills
-      .map(skill => parse(this.store.gameData.enemySkills, skill.id, skill.ai, skill.rnd));
+      .map(skill => parse(id => this.store.gameData.getEnemySkill(id), skill.id, skill.ai, skill.rnd));
 
     const data = {
       atk: Curve.valueAt(this.level, this.card.enemy.maxLevel, this.card.enemy.atk)

@@ -26,7 +26,7 @@ export class CardStats extends React.Component<CardStatsProps> {
   private get id() { return this.props.id || 0; }
 
   @computed
-  private get card() { return this.store.gameData.cards.find(card => card.id === this.id)!; }
+  private get card() { return this.store.gameData.getCard(this.id)!; }
 
   private disposer: IReactionDisposer;
 

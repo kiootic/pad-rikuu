@@ -11,9 +11,9 @@ type SkillParser = (id: number) => Skill[];
 type ParsedSkill = Skill | null | Array<Skill | null>;
 type SkillParsers = { parser: SkillParser } & { [type: number]: (...params: number[]) => ParsedSkill };
 
-export function parse(skillData: SkillData[], id: number) {
+export function parse(lookup: (id: number) => SkillData | undefined, id: number) {
   function parser(skillId: number): Skill[] {
-    const skill = skillData.find(s => s.id === skillId);
+    const skill = lookup(skillId);
     if (!skill) return [];
     if (!parsers[skill.type]) {
       return [{ kind: SkillKinds.Unknown }];

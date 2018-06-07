@@ -37,7 +37,7 @@ export class CardIcon extends React.Component<CardIconProps> {
         <Canvas width={IconSize} height={IconSize} render={this.renderIcon} />
       </div>;
 
-    const card = this.store.gameData.cards.find(c => c.id === this.props.id);
+    const card = this.store.gameData.getCard(this.props.id);
     if (this.props.link === false) return content;
     else {
       const link = <AppLink to={`/cards/${this.props.id}`}>{content}</AppLink>;

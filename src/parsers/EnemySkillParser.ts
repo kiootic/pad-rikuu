@@ -16,10 +16,10 @@ type SkillParsers = {
 
 /* tslint:disable:no-bitwise */
 
-export function parse(skillData: SkillData[], id: number, ai: number, rnd: number): Skill[] {
+export function parse(lookup: (id: number) => SkillData | undefined, id: number, ai: number, rnd: number): Skill[] {
   // tslint:disable-next-line:no-shadowed-variable
   function parser(skillId: number, ai?: number, rnd?: number): Skill[] {
-    const skill = skillData.find(s => s.id === skillId);
+    const skill = lookup(skillId);
     if (!skill) {
       return [{ id: skillId, kind: SkillKinds.Unknown }];
     }
