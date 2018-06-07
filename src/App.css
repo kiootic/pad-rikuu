@@ -10,29 +10,9 @@
   content: 'loading...';
 }
 
-.App-content-wrapper {
-  flex: 1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.App-content {
-  flex: 1;
-  display: flex;
-}
-
 .App-root {
   width: 100%;
   min-height: 100vh;
   display: flex;
-  flex-flow: row wrap;
-}
-
-.App-drawer {
-  width: 240px;
-}
-
-.App-title {
-  margin-right: 64px;
+  flex-direction: column;
 }

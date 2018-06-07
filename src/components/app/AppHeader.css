@@ -1,0 +1,12 @@
+.AppHeader-header {
+  width: 320px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.AppHeader-title {
+  text-decoration: none;
+  padding: 8px;
+  margin: 0 32px;
+}
