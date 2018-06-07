@@ -18,9 +18,6 @@ let api: undefined | {
     osVersion: string
   },
   fetchApi(apiUrl: string, action: string, ...query: Array<{ [name: string]: any }>): Promise<any>,
-  computeKey(value: string, rand?: number): Promise<number>,
-  decodeData(input: string): string,
-  encodeData(input: string, rand?: number): string,
   dlWave(dungeon: number, floor: number, apiUrl: string, info: PlayerInfo): Promise<WaveData>,
 };
 
@@ -35,7 +32,4 @@ export const exists = !!api;
 
 export const config = (api && api.config)!;
 export const fetchApi = (api && api.fetchApi)!;
-export const computeKey = (api && api.computeKey)!;
-export const decodeData = (api && api.decodeData)!;
-export const encodeData = (api && api.encodeData)!;
 export const dlWave = (api && api.dlWave)!;

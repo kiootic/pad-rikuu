@@ -67,7 +67,7 @@ export async function downloadWaves(basePath: string, apiUrl: string, info: api.
         waves.time, waves.dungeon, waves.floor, waves.data
       ]);
     }
-    await new Promise(r => setTimeout(r, 500 + (Math.random() * 200 - 100)));
+    await new Promise(r => setTimeout(r, 250 + (Math.random() * 200 - 100)));
   }
 
   await db.close();
