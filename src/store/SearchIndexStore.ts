@@ -25,6 +25,7 @@ export class SearchIndexStore extends BaseStore {
     this.entries.length = 0;
 
     for (const card of cards) {
+      if (card.isEmpty) continue;
       this.entries.push({
         key: `card:${card.id}`,
         text: `${card.id} - ${card.name}`,
