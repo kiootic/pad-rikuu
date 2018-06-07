@@ -10,7 +10,7 @@
 
 .EnemyDetails-heading {
   text-transform: uppercase;
-  margin-bottom: 16px !important;
+  margin-bottom: 16px;
 }
 
 .EnemyDetails-section.EnemyDetails-image {

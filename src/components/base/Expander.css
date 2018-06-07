@@ -5,7 +5,7 @@
 
 .Expander-header {
   width: 100%;
-  display: flex !important;
+  display: flex;
   flex-direction: row;
   align-items: flex-start;
 }

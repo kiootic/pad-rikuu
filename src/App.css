@@ -25,16 +25,16 @@
 .App-root {
   width: 100%;
   min-height: 100vh;
-  display: flex !important;
+  display: flex;
   flex-flow: row wrap;
 }
 
 .App-drawer {
-  width: 240px !important;
+  width: 240px;
 }
 
 .App-title {
-  margin-right: 64px !important;
+  margin-right: 64px;
 }
 
 .App-search {

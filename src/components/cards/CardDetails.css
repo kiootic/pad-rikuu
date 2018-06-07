@@ -10,7 +10,7 @@
 
 .CardDetails-heading {
   text-transform: uppercase;
-  margin-bottom: 16px !important;
+  margin-bottom: 16px;
 }
 
 .CardDetails-section.CardDetails-image {
