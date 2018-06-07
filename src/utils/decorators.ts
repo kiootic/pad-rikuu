@@ -1,14 +1,24 @@
 import { observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
+import { withRouter as reactWithRouter } from 'react-router-dom';
 
-export function store(target: object, propertyKey: string) {
-  Object.defineProperty(target, propertyKey, {
-    configurable: true,
-    get(this: any) {
-      return this.props.store;
-    }
-  });
+export function withRouter<T extends React.ComponentType>(component: T): T {
+  return reactWithRouter(component as any) as any;
 }
+
+export function prop(name: string) {
+  return (target: object, propertyKey: string) => {
+    Object.defineProperty(target, propertyKey, {
+      configurable: true,
+      get(this: any) {
+        return this.props[name];
+      }
+    });
+  };
+}
+
+export const history = prop('history');
+export const store = prop('store');
 
 export function uiState<T>(key: string, defaultFn: () => T) {
   return (target: object, propertyKey: string) => {

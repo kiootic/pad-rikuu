@@ -1,0 +1,10 @@
+.AppSearch-root {
+  min-width: 480px;
+  position: relative;
+}
+
+.AppSearch-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+}

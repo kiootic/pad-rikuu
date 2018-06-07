@@ -3,6 +3,7 @@ import { AssetStore } from './AssetStore';
 import { BaseStore } from './BaseStore';
 import { GameDataStore } from './GameDataStore';
 import { ImageStore } from './ImageStore';
+import { SearchIndexStore } from './SearchIndexStore';
 
 export class Store {
   // tslint:disable:member-ordering
@@ -11,6 +12,7 @@ export class Store {
   public readonly assets = this.registerStore(AssetStore);
   public readonly gameData = this.registerStore(GameDataStore);
   public readonly images = this.registerStore(ImageStore);
+  public readonly searchIndex = this.registerStore(SearchIndexStore);
   public readonly ui: Record<string, any> = {};
 
   // tslint:enable:member-ordering

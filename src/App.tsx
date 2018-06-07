@@ -1,5 +1,5 @@
 import {
-  AppBar, CssBaseline, Drawer, Icon, Input, InputAdornment, jssPreset,
+  AppBar, CssBaseline, Drawer, Icon, jssPreset,
   List, ListItem, ListItemIcon, ListItemText,
   MuiThemeProvider, Toolbar, Typography, withStyles
 } from '@material-ui/core';
@@ -9,6 +9,7 @@ import DevTools from 'mobx-react-devtools';
 import * as React from 'react';
 import { JssProvider } from 'react-jss';
 import { BrowserRouter, Redirect, Route } from 'react-router-dom';
+import { AppSearch } from 'src/components/app/AppSearch';
 import { AppLink } from 'src/components/base';
 import { CardInfo } from 'src/components/routes/CardInfo';
 import { CardList } from 'src/components/routes/CardList';
@@ -82,11 +83,7 @@ export class App extends React.Component<AppProps> {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="title" color="inherit" className="App-title">Rikuu</Typography>
-          <Input type="text" className="App-search" startAdornment={
-            <InputAdornment position="start">
-              <Icon>search</Icon>
-            </InputAdornment>
-          } />
+          <AppSearch />
         </Toolbar>
       </AppBar>
 
