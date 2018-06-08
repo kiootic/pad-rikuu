@@ -1,5 +1,6 @@
 .AppDrawer-root {
   width: calc(100% - 56px);
+  max-width: 320px;
 }
 
 .AppDrawer-search {

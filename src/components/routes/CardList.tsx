@@ -3,12 +3,13 @@ import { inject, observer } from 'mobx-react';
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { AutoSizer, GridCellProps, ScrollParams } from 'react-virtualized';
+import { AppHeader } from 'src/components/app/AppHeader';
 import { RecyclingGrid } from 'src/components/base';
 import { CardIcon } from 'src/components/cards/CardIcon';
 import { Card } from 'src/models';
 import { IconSize } from 'src/renderer/CardIconRenderer';
 import { Store } from 'src/store';
-import { bound, store, uiState } from 'src/utils';
+import { bound, getDevicePixelRatio, store, uiState } from 'src/utils';
 import './CardList.css';
 
 const NumCardPerRow = 10;
@@ -33,18 +34,23 @@ export class CardList extends React.Component<RouteComponentProps<{}>> {
   public render() {
     this._cards = this.cards;
     const scrollTop = this.uiState.scrollTop;
-    return (
-      <AutoSizer>{({ width, height }) => {
-        this._cardsPerRow = IconSize * NumCardPerRow > width ? NumCardPerRow / 2 : NumCardPerRow;
-        this._iconScale = Math.min(1, width / (IconSize * this._cardsPerRow));
+    return <>
+      <AppHeader />
+      <div className="CardList-root">
+        <AutoSizer>{({ width, height }) => {
+          const deviceScale = getDevicePixelRatio();
+          const iconSize = IconSize / deviceScale;
+          this._cardsPerRow = iconSize * NumCardPerRow > width ? NumCardPerRow / 2 : NumCardPerRow;
+          this._iconScale = Math.min(deviceScale, width / (iconSize * this._cardsPerRow));
 
-        return <RecyclingGrid width={width} height={height} className="CardList-grid"
-          rowHeight={IconSize * this._iconScale} rowCount={Math.ceil(this._cards.length / this._cardsPerRow)}
-          columnWidth={IconSize * this._iconScale} columnCount={this._cardsPerRow} cellRenderer={this.renderCard}
-          onScroll={this.onScroll} scrollTop={scrollTop} tabIndex={null}
-        />;
-      }}</AutoSizer>
-    );
+          return <RecyclingGrid width={width} height={height} className="CardList-grid"
+            rowHeight={iconSize * this._iconScale} rowCount={Math.ceil(this._cards.length / this._cardsPerRow)}
+            columnWidth={iconSize * this._iconScale} columnCount={this._cardsPerRow} cellRenderer={this.renderCard}
+            onScroll={this.onScroll} scrollTop={scrollTop} tabIndex={null}
+          />;
+        }}</AutoSizer>
+      </div>
+    </>;
   }
 
   @computed

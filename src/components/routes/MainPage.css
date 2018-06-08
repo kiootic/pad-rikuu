@@ -24,7 +24,7 @@
   margin: 8px;
 }
 
-@media (max-height: 640px) {
+@media (max-height: 800px) {
   .MainPage-search-popup {
     bottom: 100%;
   }

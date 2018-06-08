@@ -4,7 +4,7 @@ import * as React from 'react';
 import { AppLink, Asset, Canvas, HoverPopup } from 'src/components/base';
 import { IconSize } from 'src/renderer/CardIconRenderer';
 import { Store } from 'src/store';
-import { bound, store } from 'src/utils';
+import { bound, getDevicePixelRatio, store } from 'src/utils';
 import './CardIcon.css';
 
 export interface CardIconProps {
@@ -21,12 +21,10 @@ export class CardIcon extends React.Component<CardIconProps> {
   private readonly store: Store;
 
   public render() {
-    const scale = this.props.scale || 1;
+    const scale = (this.props.scale || 1) * 1 / getDevicePixelRatio();
     const style = {
       width: IconSize * scale,
       height: IconSize * scale,
-      transform: `scale(${scale})`,
-      transformOrigin: 'top left'
     };
 
     let content: JSX.Element;
@@ -34,7 +32,7 @@ export class CardIcon extends React.Component<CardIconProps> {
       content = <div style={style} className={this.props.className}><div className="CardIcon-loading" /></div>;
     else
       content = <div style={style} className={this.props.className}>
-        <Canvas width={IconSize} height={IconSize} render={this.renderIcon} />
+        <Canvas className="CardIcon-canvas" width={IconSize} height={IconSize} render={this.renderIcon} />
       </div>;
 
     const card = this.store.gameData.getCard(this.props.id);
@@ -44,7 +42,7 @@ export class CardIcon extends React.Component<CardIconProps> {
       if (!card) return link;
 
       return (
-        <HoverPopup anchor="pointer" header={link}>
+        <HoverPopup header={link}>
           <Typography className="CardIcon-info">
             <span className="CardIcon-info-header">
               <Typography variant="caption" className="CardIcon-info-no">No. {card.id}</Typography>

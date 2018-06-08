@@ -1,14 +1,18 @@
 .AppHeader-root {
   padding: 0 8px;
   min-height: 56px !important;
+  height: 56px !important;
 }
 
-.AppHeader-header {
-  width: calc(100% - 56px);
-  max-width: 600px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.AppHeader-wrapper::before {
+  content: '';
+  display: block;
+  height: 56px;
+}
+
+.AppHeader-menu {
+  width: 40px;
+  height: 40px;
 }
 
 .AppHeader-title {
@@ -19,7 +23,38 @@
   font-size: 16px;
 }
 
-.AppHeader-menu {
-  width: 40px;
-  height: 40px;
+.AppHeader-spacer {
+  flex: 1;
+}
+
+.AppHeader-actions {
+  display: flex;
+}
+
+.AppHeader-search {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  padding-right: 8px;
+  display: flex;
+  align-items: stretch;
+}
+
+.AppHeader-search-close {
+  position: absolute;
+  right: 8px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.AppHeader-search-field {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }

@@ -1,4 +1,4 @@
-import { FormControlLabel, Icon, IconButton, Paper, Switch, Tooltip } from '@material-ui/core';
+import { FormControlLabel, Icon, IconButton, Paper, Switch } from '@material-ui/core';
 import { action, computed, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
@@ -83,17 +83,13 @@ export class CardImage extends React.Component<CardImageProps> {
               />
             </Paper>
           </div>
-          <Tooltip
-            title={<span className="CardImage-timeline-moment">{this.time.toFixed(2)} s</span>}
-            placement="bottom-start"
-          >
-            <div className="CardImage-timeline-wrapper">
-              <input className="CardImage-timeline" type="range"
-                min={0} max={this.imageDescriptor ? this.imageDescriptor.time : 0} step="any"
-                value={this.time} onChange={this.timeChanged}
-              />
-            </div>
-          </Tooltip>
+          <span className="CardImage-timeline-moment">{this.time.toFixed(1)} s</span>
+          <div className="CardImage-timeline-wrapper">
+            <input className="CardImage-timeline" type="range"
+              min={0} max={this.imageDescriptor ? this.imageDescriptor.time : 0} step="any"
+              value={this.time} onChange={this.timeChanged}
+            />
+          </div>
         </div>
       </div>
     );

@@ -22,6 +22,8 @@ function makeDummyEntry(text: string) {
 export interface AppSearchProps {
   className?: string;
   popupClassName?: string;
+  showAdornment?: boolean;
+  autoFocus?: boolean;
   onNavigate?: () => void;
 }
 
@@ -55,11 +57,12 @@ export class AppSearch extends React.Component<AppSearchProps> {
           ({ isOpen, getInputProps, getItemProps, inputValue, highlightedIndex }) => {
             return (
               <div className={`AppSearch-root ${this.props.className || ''}`}>
-                <Input
-                  type="text" inputProps={getInputProps()} fullWidth={true}
+                <Input type="text" className="AppSearch-field" fullWidth={true}
+                  inputProps={getInputProps()} autoFocus={this.props.autoFocus}
+                  disableUnderline={this.props.showAdornment === false}
                   startAdornment={
-                    <InputAdornment position="start">
-                      <Icon>search</Icon>
+                    <InputAdornment position="start" className="AppSearch-adornment">
+                      {this.props.showAdornment !== false && <Icon>search</Icon>}
                     </InputAdornment>
                   }
                 />

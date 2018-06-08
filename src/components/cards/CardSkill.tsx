@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import { computed } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { Asset, AssetBox, HoverPopup } from 'src/components/base';
+import { Asset, AssetBox, Popup } from 'src/components/base';
 import { Expander } from 'src/components/base/Expander';
 import { Attributes, Types } from 'src/models';
 import {
@@ -45,11 +45,11 @@ export class CardSkill extends React.Component<CardSkillProps> {
           <Typography variant="title">{skill.name}</Typography>
           <div className="CardSkill-spacer" />
 
-          {(skill.maxLevel || undefined) && <Typography variant="body2" className="CardSkill-header-item">
+          {(skill.maxLevel || undefined) && <Typography variant="body1" className="CardSkill-header-item">
             max level: {skill.maxLevel}
           </Typography>}
 
-          {(skill.initialCooldown || undefined) && <Typography variant="body2" className="CardSkill-header-item">
+          {(skill.initialCooldown || undefined) && <Typography variant="body1" className="CardSkill-header-item">
             cooldown: {skill.initialCooldown} (min. {skill.initialCooldown - skill.maxLevel + 1})
           </Typography>}
         </div>
@@ -57,9 +57,9 @@ export class CardSkill extends React.Component<CardSkillProps> {
         <Expander header="Skill Data">
           <div className="CardSkill-data">
             <div className="CardSkill-skill-list">{this.parsedSkills.map(renderSkillEntry)}</div>
-            <HoverPopup className="CardSkill-raw-icon" anchor="left" header={<Icon>code</Icon>}>
+            <Popup className="CardSkill-raw-icon" anchor="left" header={<Icon>code</Icon>}>
               <div className="CardSkill-raw-data">{JSON.stringify(this.parsedSkills, null, 4)}</div>
-            </HoverPopup>
+            </Popup>
           </div>
         </Expander>
       </ div>

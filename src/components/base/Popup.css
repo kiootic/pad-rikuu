@@ -1,0 +1,27 @@
+.Popup-root {
+  position: relative;
+  cursor: pointer;
+}
+
+.Popup-popup-root {
+  pointer-events: none;
+  position: absolute;
+  z-index: 1200;
+}
+.Popup-popup {
+  pointer-events: auto;
+  position: absolute;
+}
+
+.Popup-popup-left {
+  right: 0;
+  transform-origin: top right;
+}
+.Popup-popup-right {
+  left: 0;
+  transform-origin: top left;
+}
+.Popup-popup-action {
+  right: 0;
+  transform-origin: top right;
+}

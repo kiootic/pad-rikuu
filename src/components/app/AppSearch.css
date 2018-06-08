@@ -1,5 +1,15 @@
 .AppSearch-root {
   position: relative;
+  min-height: 48px;
+}
+
+.AppSearch-adornment {
+  width: 32px;
+  align-self: center;
+}
+
+.AppSearch-field {
+  height: 100%;
 }
 
 .AppSearch-dropdown {

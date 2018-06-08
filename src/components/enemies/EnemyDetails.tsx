@@ -1,4 +1,4 @@
-import { Hidden, Paper, Typography } from '@material-ui/core';
+import { Paper, Typography } from '@material-ui/core';
 import { clamp } from 'lodash';
 import { action, computed, IReactionDisposer, observable, reaction } from 'mobx';
 import { inject, observer } from 'mobx-react';
@@ -64,12 +64,7 @@ export class EnemyDetails extends React.Component<EnemyDetailsProps> {
           <CardImage id={card.id} />
         </>)}
         {section('', 'summary', <>
-          <Hidden smDown={true}>
-            <CardIcon id={card.id} link={false} />
-          </Hidden>
-          <Hidden smUp={true}>
-            <CardIcon id={card.id} link={false} scale={0.8} />
-          </Hidden>
+          <CardIcon id={card.id} link={false} />
           <div className="EnemyDetails-summary-basic">
             <p>No. {card.id}</p>
             <Typography variant="title" component="h1">{card.name}</Typography>

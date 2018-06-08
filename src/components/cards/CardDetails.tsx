@@ -1,9 +1,9 @@
-import { Hidden, Paper, Typography } from '@material-ui/core';
+import { Paper, Typography } from '@material-ui/core';
 import { repeat } from 'lodash';
 import { computed } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { Asset, HoverPopup } from 'src/components/base';
+import { Asset, Popup } from 'src/components/base';
 import { CardEvolution } from 'src/components/cards/CardEvolution';
 import { CardIcon } from 'src/components/cards/CardIcon';
 import { CardImage } from 'src/components/cards/CardImage';
@@ -55,24 +55,19 @@ export class CardDetails extends React.Component<CardDetailsProps> {
             )}</div>
             {
               card.superAwakenings.length === 0 ? null : <div className="CardDetails-awakenings-col">
-                <HoverPopup anchor="left" header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}>
+                <Popup anchor="left" header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}>
                   <div className="CardDetails-awakenings-super">{
                     card.superAwakenings.map((id: number, i: number) =>
                       <Asset key={i} className="CardDetails-awakening" assetId={`awakening-${id}`} />
                     )
                   }</div>
-                </HoverPopup>
+                </Popup>
               </div>
             }
           </div>
         </>)}
         {section('', 'summary', <>
-          <Hidden smDown={true}>
-            <CardIcon id={card.id} link={false} />
-          </Hidden>
-          <Hidden smUp={true}>
-            <CardIcon id={card.id} link={false} scale={0.8} />
-          </Hidden>
+          <CardIcon id={card.id} link={false} />
           <div className="CardDetails-summary-basic">
             <p>No. {card.id}</p>
             <Typography variant="title" component="h1">{card.name}</Typography>

@@ -5,3 +5,9 @@ export const theme = createMuiTheme({
     type: 'dark'
   },
 });
+
+export const themeInvert = createMuiTheme({
+  palette: {
+    type: 'light'
+  },
+});

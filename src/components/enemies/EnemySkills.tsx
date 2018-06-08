@@ -41,7 +41,6 @@ export class EnemySkills extends React.Component<EnemySkillsProps> {
     const data = {
       atk: Curve.valueAt(this.level, this.card.enemy.maxLevel, this.card.enemy.atk)
     };
-    console.log(skills);
 
     return (
       <ol className="EnemySkills-root">{

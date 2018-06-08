@@ -1,10 +1,11 @@
-import { Icon, Typography } from '@material-ui/core';
+import { Icon, IconButton, MenuItem, Typography } from '@material-ui/core';
 import { maxBy, minBy } from 'lodash';
-import { computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
-import { AppLinkButton, HoverPopup } from 'src/components/base';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import { AppHeader } from 'src/components/app/AppHeader';
+import { Popup } from 'src/components/base';
 import { CardDetails } from 'src/components/cards/CardDetails';
 import { EnemyDetails } from 'src/components/enemies/EnemyDetails';
 import { Card } from 'src/models';
@@ -17,6 +18,9 @@ import './CardInfo.css';
 export class CardInfo extends React.Component<RouteComponentProps<{ type: string, id: string }>> {
   @store
   private readonly store: Store;
+
+  @observable
+  private optionOpened = false;
 
   @computed
   private get id() {
@@ -68,42 +72,53 @@ export class CardInfo extends React.Component<RouteComponentProps<{ type: string
 
     const linkButton = (type: string, card: Card) => {
       return (
-        <AppLinkButton to={`/${type}/${card.id}`} disabled={this.type === type && this.id === card.id}>
+        <MenuItem key={card.id}
+          component={Link} {...{ to: `/${type}/${card.id}` }}
+          disabled={this.type === type && this.id === card.id}
+          onClick={this.closeOptions}
+        >
           No. {card.id} - {card.name}
-        </AppLinkButton>
+        </MenuItem>
       );
     };
 
-    return (
+    return <>
+      <AppHeader>
+        <IconButton disabled={!prev} {...{ to: `/${this.type}/${prev && prev.id}`, replace: true }} component={Link} className="CardInfo-prev">
+          <Icon>chevron_left</Icon>
+        </IconButton>
+        <IconButton disabled={!next} {...{ to: `/${this.type}/${next && next.id}`, replace: true }} component={Link} className="CardInfo-next">
+          <Icon>chevron_right</Icon>
+        </IconButton>
+        <Popup
+          header={<IconButton><Icon>settings</Icon></IconButton>} className="CardInfo-options"
+          anchor="action" opened={this.optionOpened} open={this.openOptions} close={this.closeOptions}
+        >
+          <ul className="CardInfo-option-list">
+            <Typography variant="caption" component="label" className="CardInfo-option-title">Card info</Typography>
+            {linkButton('cards', thisCard)}
+            <Typography variant="caption" component="label" className="CardInfo-option-title">Enemy info</Typography>
+            {this.alternativeCards.map(card => linkButton('enemies', card))}
+          </ul>
+        </Popup>
+      </AppHeader>
       <main className="CardInfo-root">
-        <div className="CardInfo-content">
-          {
-            this.type === 'cards' ?
-              <CardDetails id={this.id} className="CardInfo-details" /> :
-              <EnemyDetails id={this.id} className="CardInfo-details" />
-          }
-
-          <HoverPopup anchor="left" header={<Icon>settings</Icon>} className="CardInfo-options">
-            <ul className="CardInfo-option-list">
-              <li className="CardInfo-option-title"><Typography variant="caption" component="label">Card info</Typography></li>
-              <li>{linkButton('cards', thisCard)}</li>
-              <li className="CardInfo-option-title"><Typography variant="caption" component="label">Enemy info</Typography></li>
-              {this.alternativeCards.map(card => <li key={card.id}>{linkButton('enemies', card)}</li>)}
-            </ul>
-          </HoverPopup>
-        </div>
-
-        {
-          this.type === 'cards' ? <>
-            <AppLinkButton disabled={!prev} to={`/cards/${prev && prev.id}`} replace={true} className="CardInfo-prev">
-              <Icon>chevron_left</Icon>
-            </AppLinkButton>
-            <AppLinkButton disabled={!next} to={`/cards/${next && next.id}`} replace={true} className="CardInfo-next">
-              <Icon>chevron_right</Icon>
-            </AppLinkButton>
-          </> : null
-        }
+        <div className="CardInfo-content">{
+          this.type === 'cards' ?
+            <CardDetails id={this.id} className="CardInfo-details" /> :
+            <EnemyDetails id={this.id} className="CardInfo-details" />
+        }</div>
       </main>
-    );
+    </>;
+  }
+
+  @action.bound
+  private openOptions() {
+    this.optionOpened = true;
+  }
+
+  @action.bound
+  private closeOptions() {
+    this.optionOpened = false;
   }
 }

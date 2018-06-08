@@ -1,6 +1,5 @@
-import { Hidden, Icon, List, ListItem, ListItemIcon, ListItemText, SwipeableDrawer } from '@material-ui/core';
+import { Icon, List, ListItem, ListItemIcon, ListItemText, SwipeableDrawer } from '@material-ui/core';
 import * as React from 'react';
-import { AppSearch } from 'src/components/app/AppSearch';
 import { AppLink } from 'src/components/base';
 import './AppDrawer.css';
 
@@ -25,11 +24,8 @@ export class AppDrawer extends React.Component<AppDrawerProps> {
     return (
       <SwipeableDrawer
         open={this.props.opened} onOpen={this.props.openDrawer} onClose={this.props.closeDrawer}
-        classes={{ paper: 'AppDrawer-root' }} disableSwipeToOpen={false}
+        classes={{ paper: 'AppDrawer-root' }}
       >
-        <Hidden smUp={true}>
-          <AppSearch className="AppDrawer-search" onNavigate={this.props.closeDrawer} />
-        </Hidden>
         <List>
           {listItem('Cards', 'collections', '/cards')}
         </List>

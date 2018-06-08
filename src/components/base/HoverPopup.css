@@ -1,26 +1,16 @@
 .HoverPopup-root {
   position: relative;
-  cursor: pointer;
 }
 
 .HoverPopup-popup-root {
   pointer-events: none;
-}
-.HoverPopup-popup {
-  pointer-events: auto;
-  position: absolute;
+  position: fixed;
+  z-index: 1200;
 }
 
-.HoverPopup-popup-left {
-  right: 0;
-  transform-origin: top right;
-}
-.HoverPopup-popup-right {
-  left: 0;
-  transform-origin: top left;
-}
-.HoverPopup-popup-pointer {
+.HoverPopup-popup {
   pointer-events: none;
+  position: absolute;
   margin-left: 16px;
   margin-top: 16px;
   transform-origin: top left;

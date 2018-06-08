@@ -56,7 +56,15 @@
   .EnemyDetails-section {
     margin: 8px 0;
   }
+  .EnemyDetails-section h1, .EnemyDetails-section h2 {
+    font-size: 1rem;
+  }
   .EnemyDetails-section.EnemyDetails-summary > section {
-    flex-direction: column;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    padding: 0 16px;
+  }
+  .EnemyDetails-summary-basic {
+    flex: initial;
   }
 }

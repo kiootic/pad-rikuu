@@ -58,6 +58,7 @@
 .CardImage-timeline-wrapper {
   height: 32px;
   flex: 1;
+  margin: 0 4px;
 
   display: flex;
   align-items: center;

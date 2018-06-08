@@ -1,36 +1,41 @@
 import { action, observable } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer, Provider } from 'mobx-react';
 import * as React from 'react';
 import { AppDrawer } from 'src/components/app/AppDrawer';
-import { AppHeader } from 'src/components/app/AppHeader';
 import { AppRoutes } from 'src/components/app/AppRoutes';
 import { withRouter } from 'src/utils';
 import './AppRoot.css';
 
+export interface DrawerController {
+  readonly drawerOpened: boolean;
+  openDrawer(): void;
+  closeDrawer(): void;
+}
+
 @withRouter
 @observer
-export class AppRoot extends React.Component {
+export class AppRoot extends React.Component implements DrawerController {
   @observable
-  private drawerOpened = false;
+  public drawerOpened = false;
 
   public render() {
-    return <>
-      <AppHeader openDrawer={this.openDrawer} />
-      <AppDrawer openDrawer={this.openDrawer} closeDrawer={this.closeDrawer} opened={this.drawerOpened} />
-
-      <div className="AppRoot-content">
-        <AppRoutes />
-      </div>
-    </>;
+    return (
+      <Provider drawer={this}>
+        <>
+          <AppDrawer openDrawer={this.openDrawer} closeDrawer={this.closeDrawer} opened={this.drawerOpened} />
+          <AppRoutes />
+        </>
+      </Provider>
+    );
   }
 
   @action.bound
-  private openDrawer() {
+  public openDrawer() {
     this.drawerOpened = true;
   }
 
   @action.bound
-  private closeDrawer() {
+  public closeDrawer() {
     this.drawerOpened = false;
   }
 }

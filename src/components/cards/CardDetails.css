@@ -84,19 +84,25 @@
   .CardDetails-section {
     margin: 8px 0;
   }
-  .CardDetails-awakenings {
-    transform: scale(0.5);
-    transform-origin: top right;
-    top: 8px;
-    right: 8px;
-  }
-  .CardDetails-awakenings-super {
-    transform: scale(0.5);
-    transform-origin: top left;
-    width: 64px;
-    height: 24px;
+  .CardDetails-section h1, .CardDetails-section h2 {
+    font-size: 1rem;
   }
   .CardDetails-section.CardDetails-summary > section {
-    flex-direction: column;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    padding: 0 16px;
+  }
+  .CardDetails-summary-basic {
+    flex: initial;
+  }
+}
+
+@media (min-resolution: 192dpi) {
+  .CardDetails-awakening {
+    margin: 2px;
+  }
+  .CardDetails-awakenings {
+    top: 8px;
+    right: 8px;
   }
 }

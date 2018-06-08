@@ -1,3 +1,7 @@
+.CardList-root {
+  flex: 1;
+}
+
 .CardList-grid {
   display: flex;
   justify-content: center;

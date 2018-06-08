@@ -1,5 +1,5 @@
 import { range } from 'lodash';
-import { action } from 'mobx';
+import { action, observable } from 'mobx';
 
 export function fetchImage(url: string) {
   const img = new Image();
@@ -12,6 +12,15 @@ export function fetchImage(url: string) {
 
 export function setImmediate(fn: () => void) {
   setTimeout(action(fn), 0);
+}
+
+let pixelRatio: { ratio: number };
+export function getDevicePixelRatio() {
+  if (!pixelRatio) {
+    pixelRatio = observable({ ratio: window.devicePixelRatio });
+    setInterval(action(() => pixelRatio.ratio = window.devicePixelRatio), 5000);
+  }
+  return pixelRatio.ratio;
 }
 
 export function parseFlags<T extends number>(flags: number): T[] {
