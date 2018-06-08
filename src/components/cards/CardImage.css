@@ -3,6 +3,10 @@
   line-height: 0;
 }
 
+.CardImage-canvas {
+  max-width: 100%;
+}
+
 .CardImage-control {
   position: absolute;
   left: 0;

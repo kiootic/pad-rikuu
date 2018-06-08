@@ -1,5 +1,4 @@
 .AppSearch-root {
-  min-width: 480px;
   position: relative;
 }
 
@@ -7,4 +6,5 @@
   position: absolute;
   left: 0;
   right: 0;
+  z-index: 10000;
 }

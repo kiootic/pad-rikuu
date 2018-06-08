@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core';
 import { create } from 'jss';
 import { observer, Provider } from 'mobx-react';
-import DevTools from 'mobx-react-devtools';
 import * as React from 'react';
 import { JssProvider } from 'react-jss';
 import { BrowserRouter } from 'react-router-dom';
@@ -52,7 +51,6 @@ export class App extends React.Component<AppProps> {
             </MuiThemeProvider>
           </JssProvider>
         </Provider>
-        <DevTools />
       </>
     );
   }

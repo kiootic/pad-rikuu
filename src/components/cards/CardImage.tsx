@@ -66,7 +66,10 @@ export class CardImage extends React.Component<CardImageProps> {
   public render() {
     return (
       <div className="CardImage-root">
-        <Canvas width={ImageSize * this.scale} height={ImageHeight * this.scale} render={this.renderImage} />
+        <Canvas
+          render={this.renderImage} className="CardImage-canvas"
+          width={ImageSize * this.scale} height={ImageHeight * this.scale}
+        />
         <div className="CardImage-control">
           <IconButton className="CardImage-button" disableRipple={true} onClick={this.toggleActive}>
             <Icon>{this.active ? 'pause' : 'play_arrow'}</Icon>

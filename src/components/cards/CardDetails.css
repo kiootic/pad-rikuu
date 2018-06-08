@@ -79,3 +79,24 @@
   display: flex;
   flex-direction: column;
 }
+
+@media (max-width: 600px) {
+  .CardDetails-section {
+    margin: 8px 0;
+  }
+  .CardDetails-awakenings {
+    transform: scale(0.5);
+    transform-origin: top right;
+    top: 8px;
+    right: 8px;
+  }
+  .CardDetails-awakenings-super {
+    transform: scale(0.5);
+    transform-origin: top left;
+    width: 64px;
+    height: 24px;
+  }
+  .CardDetails-section.CardDetails-summary > section {
+    flex-direction: column;
+  }
+}

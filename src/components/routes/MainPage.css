@@ -5,3 +5,27 @@
   align-items: center;
   margin-top: 128px;
 }
+
+.MainPage-image-container {
+  max-width: 100%;
+  width: 534px;
+}
+
+.MainPage-image {
+  background: url(/assets/rikuu.png);
+  background-position: center;
+  background-size: cover;
+  padding-bottom: 66.66%;
+}
+
+.MainPage-search {
+  width: calc(100% - 16px);
+  max-width: 600px;
+  margin: 8px;
+}
+
+@media (max-height: 640px) {
+  .MainPage-search-popup {
+    bottom: 100%;
+  }
+}

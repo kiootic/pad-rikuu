@@ -7,9 +7,11 @@ export class MainPage extends React.Component {
   public render() {
     return (
       <div className="MainPage-root">
-        <img src="/assets/rikuu.png" />
+        <div className="MainPage-image-container">
+          <div className="MainPage-image" />
+        </div>
         <Typography variant="caption">lookup the information you need!</Typography>
-        <AppSearch />
+        <AppSearch className="MainPage-search" popupClassName="MainPage-search-popup" />
       </div>
     );
   }

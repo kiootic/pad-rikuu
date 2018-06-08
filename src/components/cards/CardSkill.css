@@ -1,6 +1,6 @@
 .CardSkill-header {
   display: flex;
-  flex-direction: row;
+  flex-flow: row wrap;
 }
 
 .CardSkill-header-item {
@@ -52,3 +52,9 @@
   max-height: 300px;
   overflow-y: auto;
 }
+
+@media (max-width: 600px) {
+  .CardSkill-spacer {
+    flex-basis: 100%;
+  }
+}  

@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@material-ui/core';
+import { Hidden, Paper, Typography } from '@material-ui/core';
 import { repeat } from 'lodash';
 import { computed } from 'mobx';
 import { inject, observer } from 'mobx-react';
@@ -55,7 +55,7 @@ export class CardDetails extends React.Component<CardDetailsProps> {
             )}</div>
             {
               card.superAwakenings.length === 0 ? null : <div className="CardDetails-awakenings-col">
-                <HoverPopup header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}>
+                <HoverPopup anchor="left" header={<Asset className="CardDetails-awakening" assetId="awakening-unknown" />}>
                   <div className="CardDetails-awakenings-super">{
                     card.superAwakenings.map((id: number, i: number) =>
                       <Asset key={i} className="CardDetails-awakening" assetId={`awakening-${id}`} />
@@ -67,7 +67,12 @@ export class CardDetails extends React.Component<CardDetailsProps> {
           </div>
         </>)}
         {section('', 'summary', <>
-          <CardIcon id={card.id} link={false} />
+          <Hidden smDown={true}>
+            <CardIcon id={card.id} link={false} />
+          </Hidden>
+          <Hidden smUp={true}>
+            <CardIcon id={card.id} link={false} scale={0.8} />
+          </Hidden>
           <div className="CardDetails-summary-basic">
             <p>No. {card.id}</p>
             <Typography variant="title" component="h1">{card.name}</Typography>

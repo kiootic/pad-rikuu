@@ -19,10 +19,16 @@ function makeDummyEntry(text: string) {
   };
 }
 
+export interface AppSearchProps {
+  className?: string;
+  popupClassName?: string;
+  onNavigate?: () => void;
+}
+
 @withRouter
 @inject('store')
 @observer
-export class AppSearch extends React.Component {
+export class AppSearch extends React.Component<AppSearchProps> {
   @store
   private readonly store: Store;
 
@@ -48,7 +54,7 @@ export class AppSearch extends React.Component {
       >{
           ({ isOpen, getInputProps, getItemProps, inputValue, highlightedIndex }) => {
             return (
-              <div className="AppSearch-root">
+              <div className={`AppSearch-root ${this.props.className || ''}`}>
                 <Input
                   type="text" inputProps={getInputProps()} fullWidth={true}
                   startAdornment={
@@ -58,7 +64,7 @@ export class AppSearch extends React.Component {
                   }
                 />
                 {isOpen && (
-                  <Paper className="AppSearch-dropdown" square={true}>{
+                  <Paper className={`AppSearch-dropdown ${this.props.popupClassName || ''}`} square={true}>{
                     this.getCandidates(inputValue || '').map((entry, i) => {
                       const props = getItemProps({ item: entry });
                       return (
@@ -125,6 +131,8 @@ export class AppSearch extends React.Component {
         break;
       }
     }
+    if (this.props.onNavigate)
+      this.props.onNavigate();
     return true;
   }
 }

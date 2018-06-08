@@ -27,18 +27,23 @@ export class CardList extends React.Component<RouteComponentProps<{}>> {
   private readonly uiState: CardListState;
 
   private _cards: Card[];
+  private _cardsPerRow: number;
+  private _iconScale: number;
 
   public render() {
     this._cards = this.cards;
     const scrollTop = this.uiState.scrollTop;
     return (
-      <AutoSizer>{({ width, height }) =>
-        <RecyclingGrid width={width} height={height} className="CardList-grid"
-          rowHeight={IconSize} rowCount={Math.ceil(this._cards.length / NumCardPerRow)}
-          columnWidth={IconSize} columnCount={NumCardPerRow} cellRenderer={this.renderCard}
+      <AutoSizer>{({ width, height }) => {
+        this._cardsPerRow = IconSize * NumCardPerRow > width ? NumCardPerRow / 2 : NumCardPerRow;
+        this._iconScale = Math.min(1, width / (IconSize * this._cardsPerRow));
+
+        return <RecyclingGrid width={width} height={height} className="CardList-grid"
+          rowHeight={IconSize * this._iconScale} rowCount={Math.ceil(this._cards.length / this._cardsPerRow)}
+          columnWidth={IconSize * this._iconScale} columnCount={this._cardsPerRow} cellRenderer={this.renderCard}
           onScroll={this.onScroll} scrollTop={scrollTop} tabIndex={null}
-        />
-      }</AutoSizer>
+        />;
+      }}</AutoSizer>
     );
   }
 
@@ -47,13 +52,13 @@ export class CardList extends React.Component<RouteComponentProps<{}>> {
 
   @bound
   private renderCard({ key, rowIndex, columnIndex, style }: GridCellProps) {
-    const index = rowIndex * NumCardPerRow + columnIndex;
+    const index = rowIndex * this._cardsPerRow + columnIndex;
     if (index >= this._cards.length) return null;
 
     const card = this._cards[index];
     if (card.isEmpty) return null;
 
-    return <main style={style} key={key}><CardIcon id={card.id} /></main>;
+    return <div style={style} key={key}><CardIcon id={card.id} scale={this._iconScale} /></div>;
   }
 
   @action.bound

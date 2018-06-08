@@ -16,7 +16,7 @@ export class AppRoot extends React.Component {
   public render() {
     return <>
       <AppHeader openDrawer={this.openDrawer} />
-      <AppDrawer closeDrawer={this.closeDrawer} opened={this.drawerOpened} />
+      <AppDrawer openDrawer={this.openDrawer} closeDrawer={this.closeDrawer} opened={this.drawerOpened} />
 
       <div className="AppRoot-content">
         <AppRoutes />

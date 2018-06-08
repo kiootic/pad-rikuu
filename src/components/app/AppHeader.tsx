@@ -1,4 +1,4 @@
-import { AppBar, Icon, IconButton, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Hidden, Icon, IconButton, Toolbar, Typography } from '@material-ui/core';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { AppSearch } from 'src/components/app/AppSearch';
@@ -12,14 +12,16 @@ export class AppHeader extends React.Component<AppHeaderProps> {
   public render() {
     return (
       <AppBar position="sticky">
-        <Toolbar>
+        <Toolbar className="AppHeader-root">
           <div className="AppHeader-header">
-            <IconButton onClick={this.props.openDrawer}><Icon>menu</Icon></IconButton>
+            <IconButton onClick={this.props.openDrawer} className="AppHeader-menu"><Icon>menu</Icon></IconButton>
             <Typography variant="title" className="AppHeader-title" component={Link as any} {...{ to: '/' }}>
               Rikuu
             </Typography>
           </div>
-          <AppSearch />
+          <Hidden smDown={true}>
+            <AppSearch />
+          </Hidden>
         </Toolbar>
       </AppBar>
     );

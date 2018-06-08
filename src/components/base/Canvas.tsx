@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import * as React from 'react';
 import { bound } from 'src/utils';
 
-export interface CanvasProps<T> {
+export interface CanvasProps<T> extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   width: number;
   height: number;
   render: (canvas: HTMLCanvasElement) => void;
@@ -23,7 +23,8 @@ export class Canvas<T> extends React.Component<CanvasProps<T>> {
   }
 
   public render() {
-    return <canvas ref={this.setCanvas} width={this.props.width} height={this.props.height} />;
+    const canvasProps = Object.assign({}, this.props, { render: undefined });
+    return <canvas ref={this.setCanvas} {...canvasProps} />;
   }
 
   @action.bound
