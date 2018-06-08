@@ -55,6 +55,10 @@ export class CardImage extends React.Component<CardImageProps> {
 
   public componentWillUnmount() {
     cancelAnimationFrame(this.frameId);
+    if (this.renderer) {
+      this.renderer.forceContextLoss();
+      this.renderer.dispose();
+    }
   }
 
   @action
@@ -97,9 +101,11 @@ export class CardImage extends React.Component<CardImageProps> {
 
   private resetImage() {
     this.imageDescriptor = undefined;
-    loadId(this.store, this.props.id).then(action(
-      (descriptor: CardImageDescriptor) => this.imageDescriptor = descriptor
-    ));
+    const id = this.props.id;
+    loadId(this.store, this.props.id).then(action((descriptor: CardImageDescriptor) => {
+      if (this.props.id === id)
+        this.imageDescriptor = descriptor;
+    }));
     this.time = 0;
   }
 
