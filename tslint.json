@@ -11,7 +11,7 @@
     "interface-name": [true, "never-prefix"],
     "no-console": false,
     "no-namespace": false,
-    "no-unused-variable": true,
+    "no-unused-variable": false,
     "object-literal-sort-keys": false,
     "quotemark": [true, "single", "jsx-double", "avoid-escape", "avoid-template"],
     "semicolon": true,
