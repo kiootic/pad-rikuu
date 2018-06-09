@@ -2,12 +2,17 @@ import { action, observable } from 'mobx';
 import { BaseStore } from 'src/store/BaseStore';
 import { AtlasImage, fetchImage, transformer } from 'src/utils';
 
-const assetNames = [
-  'card-bg',
-  'card-frames',
-  'types',
-  'awakenings',
-  'icons',
+const assetRequire = require.context('../assets');
+function asset(id: string): [string, AtlasMetadata] {
+  return [assetRequire(`./${id}.png`), assetRequire(`./${id}.json`)];
+}
+
+const assets = [
+  asset('card-bg'),
+  asset('card-frames'),
+  asset('types'),
+  asset('awakenings'),
+  asset('icons'),
 ];
 
 interface AtlasMetadata<T=any> {
@@ -27,11 +32,9 @@ export class AssetStore extends BaseStore {
   }
 
   protected async doLoad() {
-    await Promise.all(assetNames.map(async (name) => {
-      const [image, metadata] = await Promise.all([
-        fetchImage(`/assets/${name}.png`),
-        fetch(`/assets/${name}.json`).then(resp => resp.json())
-      ]);
+    await Promise.all(assets.map(async ([file, metadata]) => {
+      console.log(file, metadata);
+      const image = await fetchImage(file);
       this.onLoaded(image, metadata);
     }));
   }

@@ -3,6 +3,7 @@ import { maxBy, minBy } from 'lodash';
 import { action, computed, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { AppHeader } from 'src/components/app/AppHeader';
 import { Popup } from 'src/components/base';
@@ -83,6 +84,9 @@ export class CardInfo extends React.Component<RouteComponentProps<{ type: string
     };
 
     return <>
+      <Helmet>
+        <title>{`No. ${thisCard.id} - ${thisCard.name} - Rikuu`}</title>
+      </Helmet>
       <AppHeader>
         <IconButton disabled={!prev} {...{ to: `/${this.type}/${prev && prev.id}`, replace: true }} component={Link} className="CardInfo-prev">
           <Icon>chevron_left</Icon>
