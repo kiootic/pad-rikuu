@@ -29,9 +29,12 @@ export async function downloadGameData(rootPath: string, apiUrl: string) {
   console.log(`stamina: ${player.sta_max}`);
 
   const info: any = { pid, sid, player };
+  const version = {};
   async function dlData(name: string, verKey: string, fn: () => Promise<any>) {
     console.log(`downloading ${name}...`);
     info[camelCase(name)] = player[verKey];
+    version[kebabCase(name)] = player[verKey];
+
     mkdir(basePath, kebabCase(name));
     if (exists(basePath, kebabCase(name), `${player[verKey]}.json`)) {
       console.log('up to date.');
@@ -84,5 +87,6 @@ export async function downloadGameData(rootPath: string, apiUrl: string) {
     { dtp: 0 },
   ));
 
+  writeTo(formatJson(version), basePath, `version.json`);
   return { info, basePath };
 }

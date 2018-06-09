@@ -6,7 +6,7 @@ import { Canvas } from 'src/components/base';
 import { CardImageDescriptor, ImageSize, loadId, makeDefaultScene, setBgVisibility, updateScene } from 'src/renderer/CardImageRenderer';
 import { Store } from 'src/store';
 import { bound, store } from 'src/utils';
-import { OrthographicCamera, WebGLRenderer } from 'three';
+import { OrthographicCamera, Scene, WebGLRenderer } from 'three';
 import './CardImage.css';
 
 export const ImageHeight = 512;
@@ -34,16 +34,17 @@ export class CardImage extends React.Component<CardImageProps> {
   @observable
   private showBg = true;
 
-  @observable.shallow
+  @observable.ref
   private imageDescriptor: CardImageDescriptor | undefined;
 
   private lastTime = 0;
   private frameId = 0;
   private readonly camera = new OrthographicCamera(-ImageSize / 2, ImageSize / 2, 0, ImageHeight, 0, 10);
-  private renderer: WebGLRenderer;
+  private renderer: WebGLRenderer | undefined;
 
+  private _defaultScene: Scene | undefined;
   @computed
-  private get defaultScene() { return makeDefaultScene(this.store); }
+  private get defaultScene() { return this._defaultScene || (this._defaultScene = makeDefaultScene(this.store)); }
 
   @computed
   private get scale() { return this.props.scale || 1; }
@@ -55,10 +56,12 @@ export class CardImage extends React.Component<CardImageProps> {
 
   public componentWillUnmount() {
     cancelAnimationFrame(this.frameId);
-    if (this.renderer) {
-      this.renderer.forceContextLoss();
-      this.renderer.dispose();
+    this.disposeImage();
+    if (this._defaultScene) {
+      this._defaultScene.dispatchEvent({ type: 'dispose' });
+      this.imageDescriptor = undefined;
     }
+    this.disposeGL();
   }
 
   @action
@@ -99,8 +102,27 @@ export class CardImage extends React.Component<CardImageProps> {
     );
   }
 
+  private disposeImage() {
+    if (this.imageDescriptor) {
+      this.imageDescriptor.scene.dispatchEvent({ type: 'dispose' });
+      this.imageDescriptor = undefined;
+      if (this.renderer) {
+        this.renderer.dispose();
+      }
+    }
+  }
+
+  private disposeGL() {
+    if (this.renderer) {
+      this.renderer.forceContextLoss();
+      this.renderer.dispose();
+      this.renderer = undefined;
+    }
+  }
+
   private resetImage() {
-    this.imageDescriptor = undefined;
+    this.disposeImage();
+
     const id = this.props.id;
     loadId(this.store, this.props.id).then(action((descriptor: CardImageDescriptor) => {
       if (this.props.id === id)
@@ -132,7 +154,7 @@ export class CardImage extends React.Component<CardImageProps> {
     this.lastTime = time;
 
     if (this.active) {
-      const animLength = this.imageDescriptor ? this.imageDescriptor.time : 1;
+      const animLength = this.imageDescriptor ? this.imageDescriptor.time : 0;
       this.time = ((this.time + dt) % animLength) || 0;
     }
     this.frameId = requestAnimationFrame(this.tick);
@@ -146,6 +168,8 @@ export class CardImage extends React.Component<CardImageProps> {
   @bound
   private renderImage(canvas: HTMLCanvasElement) {
     if (!this.renderer || this.renderer.context.canvas !== canvas) {
+      if (this.renderer)
+        this.disposeGL();
       this.renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true });
       this.renderer.sortObjects = false;
       this.camera.position.z = 10;

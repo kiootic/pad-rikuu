@@ -33,7 +33,6 @@ export class AssetStore extends BaseStore {
 
   protected async doLoad() {
     await Promise.all(assets.map(async ([file, metadata]) => {
-      console.log(file, metadata);
       const image = await fetchImage(file);
       this.onLoaded(image, metadata);
     }));

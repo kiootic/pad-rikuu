@@ -1,4 +1,5 @@
 import { Store } from 'src/store';
+import { CacheOptions } from 'src/store/Storage';
 import { AtlasImage } from 'src/utils';
 
 const ImageSize = 102;
@@ -21,7 +22,7 @@ export function getIconSet(id: number): IconSet {
 
 export async function renderIconSet(store: Store, setId: number) {
   const texId = setId + 1;
-  const iconTex = await store.images.fetchImage(store.images.resolve('cards', texId));
+  const iconTex = await store.images.fetchImage(store.images.resolve('cards', texId), undefined, CacheOptions.Ignore);
 
   const canvas = document.createElement('canvas');
   canvas.width = IconSize * 10;
@@ -57,12 +58,5 @@ export async function renderIconSet(store: Store, setId: number) {
       drawImage(store.assets.lookup(`card-overlay-${card.attrs[1]}`), x, y);
   }
 
-  const result = await new Promise<string>(resolve => {
-    canvas.toBlob(blob => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(blob!);
-    });
-  });
-  return result;
+  return context.canvas;
 }

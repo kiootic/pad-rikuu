@@ -3,7 +3,8 @@ import { action, observable } from 'mobx';
 import { Card } from 'src/models';
 import { getIconSet, IconSize, renderIconSet } from 'src/renderer/CardIconRenderer';
 import { BaseStore } from 'src/store/BaseStore';
-import { AtlasImage, fetchImage, setImmediate, transformer } from 'src/utils';
+import { CacheOptions, StorageBucket } from 'src/store/Storage';
+import { setImmediate, transformer } from 'src/utils';
 
 interface DBEntry {
   readonly key: string;
@@ -24,12 +25,20 @@ export interface Entry {
   readonly files: string[];
 }
 
+type IconImageElement = HTMLImageElement | HTMLCanvasElement;
+
+export interface IconImage {
+  image: IconImageElement;
+  x: number;
+  y: number;
+}
+
 export class ImageStore extends BaseStore {
   @observable.shallow
   private readonly images = new Map<string, DBEntry>();
 
   @observable.shallow
-  private readonly icons = new Map<number, false | HTMLImageElement>();
+  private readonly icons = new Map<number, false | IconImageElement>();
 
   public resolve(type: string, id: number): Entry {
     const realId = type === 'mons' ? Card.mainId(id) : id;
@@ -46,14 +55,14 @@ export class ImageStore extends BaseStore {
     };
   }
 
-  public async fetchImage(entry: Entry, file?: string) {
+  public async fetchImage(entry: Entry, file?: string, cache?: CacheOptions) {
     const path = `/data/images/${file || entry.files[0]}`;
-    return await fetchImage(path);
+    return await this.root.storage.fetchImage(path, StorageBucket.Picture, cache);
   }
 
-  public async fetchJson(entry: Entry, file?: string) {
+  public async fetchJson(entry: Entry, file?: string, cache?: CacheOptions) {
     const path = `/data/images/${file || entry.files[0]}`;
-    return await fetch(path).then(resp => resp.json());
+    return await this.root.storage.fetchJson(path, StorageBucket.Picture, cache);
   }
 
   @transformer
@@ -69,14 +78,12 @@ export class ImageStore extends BaseStore {
     else return {
       image: setTex,
       x: col * IconSize,
-      y: row * IconSize,
-      width: IconSize,
-      height: IconSize
-    } as AtlasImage;
+      y: row * IconSize
+    } as IconImage;
   }
 
   protected async doLoad() {
-    const extlist = await fetch('/data/images/extlist.json').then(resp => resp.json());
+    const extlist = await this.root.storage.fetchJson('/data/images/extlist.json', StorageBucket.Index);
     this.onLoaded(extlist);
   }
 
@@ -84,9 +91,17 @@ export class ImageStore extends BaseStore {
   private renderIcons(setId: number) {
     this.icons.set(setId, false);
     setImmediate(async () => {
-      const data = await renderIconSet(this.root, setId);
-      const img = await fetchImage(data);
-      this.icons.set(setId, img);
+      const storage = this.root.storage;
+      const iconUrl = `/data/icons/${setId}.png`;
+
+      let image: IconImageElement | undefined = await storage.getImage(iconUrl, StorageBucket.Icon);
+      if (!image) {
+        const canvas = await renderIconSet(this.root, setId);
+        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve));
+        await this.root.storage.setItem(iconUrl, StorageBucket.Icon, blob!);
+        image = canvas;
+      }
+      this.icons.set(setId, image);
     });
   }
 

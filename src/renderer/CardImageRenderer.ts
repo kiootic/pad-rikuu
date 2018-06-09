@@ -36,12 +36,13 @@ function toTexture(image: HTMLImageElement) {
 
 export function makeDefaultScene(store: Store) {
   const scene = new Scene();
-  const bgImage = store.assets.lookup('card-image-bg').image;
+  const bgImage = toTexture(store.assets.lookup('card-image-bg').image);
   const geom = new PlaneGeometry(ImageSize, ImageSize);
-  const bg = new Mesh(geom, new MeshBasicMaterial({ map: toTexture(bgImage), side: DoubleSide }));
+  const bg = new Mesh(geom, new MeshBasicMaterial({ map: bgImage, side: DoubleSide }));
   bg.name = 'card-bg';
   bg.position.set(0, ImageSize / 2, 0);
   scene.add(bg);
+  scene.addEventListener('dispose', () => bgImage.dispose());
   return scene;
 }
 
@@ -60,6 +61,7 @@ export async function loadId(store: Store, id: number): Promise<CardImageDescrip
     sprite.scale.set(tex.image.width, entry.height, 1);
     scene.add(sprite);
 
+    scene.addEventListener('dispose', () => tex.dispose());
     return {
       type: 'frames',
       scene,
@@ -107,6 +109,7 @@ export async function loadId(store: Store, id: number): Promise<CardImageDescrip
       root.add(mesh);
     }
 
+    scene.addEventListener('dispose', () => texs.forEach(tex => tex.dispose()));
     return {
       type: 'spine',
       scene,

@@ -1,4 +1,4 @@
-import { Icon, List, ListItem, ListItemIcon, ListItemText, SwipeableDrawer } from '@material-ui/core';
+import { Divider, Icon, List, ListItem, ListItemIcon, ListItemText, SwipeableDrawer } from '@material-ui/core';
 import * as React from 'react';
 import { AppLink } from 'src/components/base';
 import './AppDrawer.css';
@@ -28,6 +28,10 @@ export class AppDrawer extends React.Component<AppDrawerProps> {
       >
         <List>
           {listItem('Cards', 'collections', '/cards')}
+        </List>
+        <Divider />
+        <List>
+          {listItem('Settings', 'settings', '/settings')}
         </List>
       </SwipeableDrawer>
     );

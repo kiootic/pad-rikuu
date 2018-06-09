@@ -1,0 +1,14 @@
+.Data-root {
+  display: flex;
+  flex-direction: column;
+}
+
+.Data-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Data-clear-data {
+  width: 120px;
+}
