@@ -3,12 +3,36 @@
   flex-direction: column;
 }
 
+.Data-root > * {
+  margin: 8px 0;
+}
+
 .Data-field {
   display: flex;
-  flex-direction: row;
+  flex-flow: row wrap;
   align-items: center;
 }
 
-.Data-clear-data {
-  width: 120px;
+.Data-field > label {
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.Data-field > .material-icons {
+  align-self: center;
+}
+
+.Data-button {
+  margin: 8px;
+  position: relative;
+}
+
+.Data-progress {
+  color: white;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }

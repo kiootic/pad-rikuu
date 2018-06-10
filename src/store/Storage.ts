@@ -1,21 +1,6 @@
 import * as LocalForage from 'localforage';
 import { fetchImage } from 'src/utils';
 
-export enum StorageBucket {
-  Index = 'index',
-  GameData = 'game',
-  Icon = 'icon',
-  Picture = 'picture'
-}
-
-export enum CacheOptions {
-  Normal = 'normal',
-  Bypass = 'bypass',
-  Ignore = 'ignore'
-}
-
-const KeyInvalidation = 'metadata:invalidation';
-
 async function fetchBlobImage(blob: Blob) {
   const blobUrl = URL.createObjectURL(blob);
   try {
@@ -29,18 +14,44 @@ function storageKey(url: string, bucket: StorageBucket) {
   return `${bucket}:${url}`;
 }
 
-export class Storage {
-  private readonly baseUrl = process.env.PUBLIC_URL!;
+export enum StorageBucket {
+  Metadata = 'metadata',
+  Index = 'index',
+  GameData = 'game',
+  Icon = 'icon',
+  Picture = 'picture'
+}
 
+export enum CacheOptions {
+  Normal = 'normal',
+  Bypass = 'bypass',
+  Ignore = 'ignore'
+}
+
+const KeyInvalidation = storageKey('/invalidation', StorageBucket.Metadata);
+const KeyBaseURL = storageKey('/baseUrl', StorageBucket.Metadata);
+
+export class Storage {
+  private _baseUrl: string;
   private invalidatedKeys: Set<string>;
 
   public async initialize() {
     this.invalidatedKeys = new Set<string>(await LocalForage.getItem<string[]>(KeyInvalidation));
-    Object.assign(window, { LocalForage });
+    // tslint:disable-next-line:no-var-require
+    this._baseUrl = await LocalForage.getItem<string>(KeyBaseURL) || require('package.json').dataUrl;
+  }
+
+  public get baseUrl() { return this._baseUrl; }
+  public async setBaseUrl(value: string) {
+    await LocalForage.setItem(KeyBaseURL, value);
+    this._baseUrl = value;
   }
 
   public async clear() {
-    await LocalForage.clear();
+    for (const key of await LocalForage.keys()) {
+      if (key === KeyBaseURL) continue;
+      await LocalForage.removeItem(key);
+    }
   }
 
   public async setItem<T>(url: string, bucket: StorageBucket, value: T) {
@@ -73,18 +84,21 @@ export class Storage {
 
   private async fetch(url: string, bucket: StorageBucket, cache: CacheOptions) {
     const key = storageKey(url, bucket);
-    let data: Blob;
 
     if (this.invalidatedKeys.has(key) && cache !== CacheOptions.Ignore)
       cache = CacheOptions.Bypass;
 
-    if (cache === CacheOptions.Normal) {
-      data = await LocalForage.getItem<Blob>(key);
+    let data = cache !== CacheOptions.Ignore && await LocalForage.getItem<Blob>(key);
+    if (cache === CacheOptions.Normal && data)
+      return new Response(data);
+
+    try {
+      data = await fetch(this.baseUrl + url).then(resp => resp.blob());
+    } catch (e) {
       if (data)
         return new Response(data);
+      throw e;
     }
-
-    data = await fetch(this.baseUrl + url).then(resp => resp.blob());
 
     if (cache !== CacheOptions.Ignore) {
       await LocalForage.setItem(key, data);

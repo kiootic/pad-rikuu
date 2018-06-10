@@ -14,6 +14,10 @@ export function setImmediate(fn: () => void) {
   setTimeout(action(fn), 0);
 }
 
+export function timeout(time: number) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 let pixelRatio: { ratio: number };
 export function getDevicePixelRatio() {
   if (!pixelRatio) {

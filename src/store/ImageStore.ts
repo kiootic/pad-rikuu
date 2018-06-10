@@ -6,7 +6,7 @@ import { BaseStore } from 'src/store/BaseStore';
 import { CacheOptions, StorageBucket } from 'src/store/Storage';
 import { setImmediate, transformer } from 'src/utils';
 
-interface DBEntry {
+export interface DBEntry {
   readonly key: string;
   readonly isCards: boolean;
   readonly id: number;
@@ -35,7 +35,7 @@ export interface IconImage {
 
 export class ImageStore extends BaseStore {
   @observable.shallow
-  private readonly images = new Map<string, DBEntry>();
+  public readonly entries = new Map<string, DBEntry>();
 
   @observable.shallow
   private readonly icons = new Map<number, false | IconImageElement>();
@@ -43,7 +43,7 @@ export class ImageStore extends BaseStore {
   public resolve(type: string, id: number): Entry {
     const realId = type === 'mons' ? Card.mainId(id) : id;
     const key = `${type}_${padStart(realId.toString(), 3, '0')}`;
-    const entry = this.images.get(key);
+    const entry = this.entries.get(key);
     if (!entry)
       throw new Error(`no image with id '${key}'`);
 
@@ -56,12 +56,12 @@ export class ImageStore extends BaseStore {
   }
 
   public async fetchImage(entry: Entry, file?: string, cache?: CacheOptions) {
-    const path = `/data/images/${file || entry.files[0]}`;
+    const path = `/images/${file || entry.files[0]}`;
     return await this.root.storage.fetchImage(path, StorageBucket.Picture, cache);
   }
 
   public async fetchJson(entry: Entry, file?: string, cache?: CacheOptions) {
-    const path = `/data/images/${file || entry.files[0]}`;
+    const path = `/images/${file || entry.files[0]}`;
     return await this.root.storage.fetchJson(path, StorageBucket.Picture, cache);
   }
 
@@ -83,7 +83,7 @@ export class ImageStore extends BaseStore {
   }
 
   protected async doLoad() {
-    const extlist = await this.root.storage.fetchJson('/data/images/extlist.json', StorageBucket.Index);
+    const extlist = await this.root.storage.fetchJson('/images/extlist.json', StorageBucket.Index);
     this.onLoaded(extlist);
   }
 
@@ -92,7 +92,7 @@ export class ImageStore extends BaseStore {
     this.icons.set(setId, false);
     setImmediate(async () => {
       const storage = this.root.storage;
-      const iconUrl = `/data/icons/${setId}.png`;
+      const iconUrl = `/icons/${setId}.png`;
 
       let image: IconImageElement | undefined = await storage.getImage(iconUrl, StorageBucket.Icon);
       if (!image) {
@@ -107,8 +107,8 @@ export class ImageStore extends BaseStore {
 
   @action
   private onLoaded(entries: DBEntry[]) {
-    this.images.clear();
+    this.entries.clear();
     for (const entry of entries)
-      this.images.set(entry.key, entry);
+      this.entries.set(entry.key, entry);
   }
 }

@@ -3,7 +3,20 @@ import { Card, EnemySkill, Skill } from 'src/models';
 import { BaseStore } from 'src/store/BaseStore';
 import { StorageBucket } from 'src/store/Storage';
 
+export interface DataVersions {
+  cards: number;
+  skills: number;
+  'enemy-skills': number;
+}
+
 export class GameDataStore extends BaseStore {
+  @observable
+  public versions: DataVersions = {
+    cards: 0,
+    skills: 0,
+    'enemy-skills': 0
+  };
+
   @observable.shallow
   private _cards: Card[] = [];
   @observable.shallow
@@ -31,16 +44,19 @@ export class GameDataStore extends BaseStore {
   public getEnemySkill(id: number) { return this._enemySkillMap.get(id); }
 
   protected async doLoad() {
-    const [cards, skills, enemySkills] = await Promise.all([
-      this.root.storage.fetchJson<Card[]>('/data/game/cards.json', StorageBucket.GameData),
-      this.root.storage.fetchJson<Skill[]>('/data/game/skills.json', StorageBucket.GameData),
-      this.root.storage.fetchJson<EnemySkill[]>('/data/game/enemy-skills.json', StorageBucket.GameData),
+    const [versions, cards, skills, enemySkills] = await Promise.all([
+      this.root.storage.fetchJson<DataVersions>('/game/version.json', StorageBucket.Index),
+      this.root.storage.fetchJson<Card[]>('/game/cards.json', StorageBucket.GameData),
+      this.root.storage.fetchJson<Skill[]>('/game/skills.json', StorageBucket.GameData),
+      this.root.storage.fetchJson<EnemySkill[]>('/game/enemy-skills.json', StorageBucket.GameData),
     ]);
-    this.onLoaded(cards, skills, enemySkills);
+    this.onLoaded(versions, cards, skills, enemySkills);
   }
 
   @action
-  private onLoaded(cards: Card[], skills: Skill[], enemySkills: EnemySkill[]) {
+  private onLoaded(versions: DataVersions, cards: Card[], skills: Skill[], enemySkills: EnemySkill[]) {
+    this.versions = versions;
+
     const populateMap = <T extends { id: number }>(elements: T[], map: Map<number, T>) => {
       map.clear();
       for (const elem of elements)

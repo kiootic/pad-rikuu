@@ -1,9 +1,14 @@
+import { withWidth as muiwithWidth } from '@material-ui/core';
 import { observable } from 'mobx';
 import { createTransformer } from 'mobx-utils';
 import { withRouter as reactWithRouter } from 'react-router-dom';
 
 export function withRouter<T extends React.ComponentType>(component: T): T {
   return reactWithRouter(component as any) as any;
+}
+
+export function withWidth(options?: typeof muiwithWidth extends (options: infer Options) => any ? Options: any) {
+  return muiwithWidth(options) as <T extends React.ComponentType>(component: T) => T;
 }
 
 export function prop(name: string) {

@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@material-ui/core';
+import { Paper, Tab, Tabs } from '@material-ui/core';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import * as React from 'react';
@@ -21,9 +21,9 @@ export class Settings extends React.Component {
       <Tabs value={this.value} onChange={this.onChange} scrollable={true} scrollButtons="auto">
         {pages.map((page, i) => <Tab label={page.title} key={i} />)}
       </Tabs>
-      <div className="Settings-content">
+      <Paper className="Settings-content">
         {React.createElement(pages[this.value])}
-      </div>
+      </Paper>
     </>;
   }
 

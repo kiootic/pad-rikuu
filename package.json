@@ -44,5 +44,6 @@
     "@types/three": "^0.92.1",
     "@types/webpack-env": "^1.13.6",
     "typescript": "^2.8.3"
-  }
+  },
+  "dataUrl": "https://kiootic.github.io/rikuu-data"
 }

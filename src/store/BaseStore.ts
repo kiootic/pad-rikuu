@@ -4,6 +4,7 @@ import { Store } from 'src/store';
 export abstract class BaseStore {
   @observable
   private _isLoaded = false;
+  @observable
   private _isLoading = false;
 
   constructor(public readonly root: Store) { }
@@ -11,21 +12,29 @@ export abstract class BaseStore {
   @computed
   public get isLoaded() { return this._isLoaded; }
 
+  @computed
+  public get isLoading() { return this._isLoading; }
+
   @action
-  public async load() {
-    if (this._isLoaded || this._isLoading) return;
+  public async load(reload = false) {
+    if ((this._isLoaded && !reload) || this._isLoading) return;
     this._isLoading = true;
+
+    let ok = false;
     try {
       await this.doLoad();
-
-      this.loadCompleted();
+      ok = true;
     } finally {
-      this._isLoading = false;
+      this.loadCompleted(ok);
     }
   }
 
   protected abstract doLoad(): Promise<void>;
 
   @action
-  private loadCompleted() { this._isLoaded = true; }
+  private loadCompleted(ok: boolean) {
+    if (ok)
+      this._isLoaded = true;
+    this._isLoading = false;
+  }
 }
