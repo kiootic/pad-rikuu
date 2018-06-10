@@ -3,6 +3,7 @@ import { create } from 'jss';
 import { observer, Provider } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { JssProvider } from 'react-jss';
 import { BrowserRouter } from 'react-router-dom';
 import { AppNotifications } from 'src/components/app/AppNotifications';
@@ -36,6 +37,10 @@ export class App extends React.Component<AppProps> {
   public render() {
     return (
       <>
+        <Helmet
+          defaultTitle="Rikuu"
+          titleTemplate="%s - Rikuu"
+        />
         <Provider store={this.props.store}>
           <JssProvider jss={jss}>
             <MuiThemeProvider theme={theme}>

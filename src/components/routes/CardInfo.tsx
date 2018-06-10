@@ -85,7 +85,7 @@ export class CardInfo extends React.Component<RouteComponentProps<{ type: string
 
     return <>
       <Helmet>
-        <title>{`No. ${thisCard.id} - ${thisCard.name} - Rikuu`}</title>
+        <title>{`No. ${thisCard.id} - ${thisCard.name}`}</title>
       </Helmet>
       <AppHeader>
         <IconButton disabled={!prev} {...{ to: `/${this.type}/${prev && prev.id}`, replace: true }} component={Link} className="CardInfo-prev">
