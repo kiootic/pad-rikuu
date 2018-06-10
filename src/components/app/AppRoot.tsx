@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import { action, observable } from 'mobx';
 import { observer, Provider } from 'mobx-react';
 import * as React from 'react';
@@ -7,7 +8,7 @@ import { AppRoutes } from 'src/components/app/AppRoutes';
 import { withRouter } from 'src/utils';
 import './AppRoot.css';
 
-export interface DrawerController {
+export interface AppController {
   readonly drawerOpened: boolean;
   openDrawer(): void;
   closeDrawer(): void;
@@ -15,18 +16,18 @@ export interface DrawerController {
 
 @withRouter
 @observer
-export class AppRoot extends React.Component implements DrawerController {
+export class AppRoot extends React.Component implements AppController {
   @observable
   public drawerOpened = false;
 
   public render() {
     return (
-      <Provider drawer={this}>
-        <>
-          <AppDrawer openDrawer={this.openDrawer} closeDrawer={this.closeDrawer} opened={this.drawerOpened} />
+      <Provider app={this}>
+        <Typography className="AppRoot-content" component="div">
           <AppNotifications />
+          <AppDrawer openDrawer={this.openDrawer} closeDrawer={this.closeDrawer} opened={this.drawerOpened} />
           <AppRoutes />
-        </>
+        </Typography>
       </Provider>
     );
   }

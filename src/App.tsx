@@ -45,22 +45,20 @@ export class App extends React.Component<AppProps> {
           <JssProvider jss={jss}>
             <MuiThemeProvider theme={theme}>
               <CssBaseline />
-              <Typography className="App-root" component="div">
-                {
-                  !this.props.store.isLoaded ? <div className="App-loading" /> : (
-                    <BrowserRouter>
-                      <AppRoot />
-                    </BrowserRouter>
-                  )
-                }
-              </Typography>
+              {
+                !this.props.store.isLoaded ? <Typography className="App-loading" component="div" /> : (
+                  <BrowserRouter>
+                    <AppRoot />
+                  </BrowserRouter>
+                )
+              }
             </MuiThemeProvider>
           </JssProvider>
         </Provider>
         {
           process.env.NODE_ENV !== 'production' &&
           <Hidden smDown={true}>
-            <DevTools position={{ right: 300 }} />
+            <DevTools position={{ right: 300, top: 0 }} />
           </Hidden>
         }
       </>

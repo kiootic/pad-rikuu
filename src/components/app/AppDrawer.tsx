@@ -1,5 +1,9 @@
-import { Divider, Icon, List, ListItem, ListItemIcon, ListItemText, SwipeableDrawer } from '@material-ui/core';
+import {
+  Divider, Drawer, Hidden, Icon, List, ListItem, ListItemIcon, ListItemText,
+  SwipeableDrawer, Typography
+} from '@material-ui/core';
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { AppLink } from 'src/components/base';
 import './AppDrawer.css';
 
@@ -21,19 +25,36 @@ export class AppDrawer extends React.Component<AppDrawerProps> {
       );
     }
 
-    return (
-      <SwipeableDrawer
-        open={this.props.opened} onOpen={this.props.openDrawer} onClose={this.props.closeDrawer}
-        classes={{ paper: 'AppDrawer-root' }}
-      >
-        <List>
-          {listItem('Cards', 'collections', '/cards')}
-        </List>
-        <Divider />
-        <List>
-          {listItem('Settings', 'settings', '/settings')}
-        </List>
-      </SwipeableDrawer>
-    );
+    const content = <>
+      <List>
+        {listItem('Cards', 'collections', '/cards')}
+      </List>
+      <Divider />
+      <List>
+        {listItem('Settings', 'settings', '/settings')}
+      </List>
+    </>;
+
+    return <>
+      <Hidden lgUp={true}>
+        <SwipeableDrawer
+          open={this.props.opened} onOpen={this.props.openDrawer} onClose={this.props.closeDrawer}
+          classes={{ paper: 'AppDrawer-paper' }} children={content}
+        />
+      </Hidden>
+      <Hidden mdDown={true}>
+        <Drawer
+          variant="permanent" open={true} onClose={this.props.closeDrawer}
+          classes={{ paper: 'AppDrawer-paper' }}
+        >
+          <div className="AppDrawer-header">
+            <Typography variant="title" component={Link as any} {...{ to: '/' }}>
+              Rikuu
+            </Typography>
+          </div>
+          {content}
+        </Drawer>
+      </Hidden>
+    </>;
   }
 }

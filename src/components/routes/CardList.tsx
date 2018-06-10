@@ -40,7 +40,7 @@ export class CardList extends React.Component<RouteComponentProps<{}>> {
         <AutoSizer>{({ width, height }) => {
           const deviceScale = getDevicePixelRatio();
           const iconSize = IconSize / deviceScale;
-          this._cardsPerRow = iconSize * NumCardPerRow > width ? NumCardPerRow / 2 : NumCardPerRow;
+          this._cardsPerRow = iconSize * NumCardPerRow > (width - 128) ? NumCardPerRow / 2 : NumCardPerRow;
           this._iconScale = Math.min(deviceScale, width / (iconSize * this._cardsPerRow));
 
           return <RecyclingGrid width={width} height={height} className="CardList-grid"

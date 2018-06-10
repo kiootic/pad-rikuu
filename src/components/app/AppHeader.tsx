@@ -1,9 +1,9 @@
-import { AppBar, Icon, IconButton, MuiThemeProvider, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Hidden, Icon, IconButton, MuiThemeProvider, Toolbar, Typography } from '@material-ui/core';
 import { action, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { DrawerController } from 'src/components/app/AppRoot';
+import { AppController } from 'src/components/app/AppRoot';
 import { AppSearch } from 'src/components/app/AppSearch';
 import { themeInvert } from 'src/theme';
 import { bound, prop } from 'src/utils';
@@ -13,14 +13,14 @@ export interface AppHeaderProps {
   children?: React.ReactNode;
 }
 
-@inject('drawer')
+@inject('app')
 @observer
 export class AppHeader extends React.Component<AppHeaderProps> {
   @observable
   private searching = false;
 
-  @prop('drawer')
-  private readonly drawer: DrawerController;
+  @prop('app')
+  private readonly app: AppController;
 
   private root: HTMLElement | null = null;
 
@@ -29,10 +29,12 @@ export class AppHeader extends React.Component<AppHeaderProps> {
       <div className="AppHeader-wrapper">
         <AppBar position="fixed" id="appHeader">
           <Toolbar className="AppHeader-root">
-            <IconButton onClick={this.drawer.openDrawer} className="AppHeader-menu"><Icon>menu</Icon></IconButton>
-            <Typography variant="title" className="AppHeader-title" component={Link as any} {...{ to: '/' }}>
-              Rikuu
-            </Typography>
+            <Hidden lgUp={true}>
+              <IconButton onClick={this.app.openDrawer} className="AppHeader-menu"><Icon>menu</Icon></IconButton>
+              <Typography variant="title" className="AppHeader-title" component={Link as any} {...{ to: '/' }}>
+                  Rikuu
+              </Typography>
+            </Hidden>
             <div className="AppHeader-spacer" />
             <div className="AppHeader-actions">
               {this.props.children}
@@ -47,8 +49,8 @@ export class AppHeader extends React.Component<AppHeaderProps> {
               </MuiThemeProvider>
             }
           </Toolbar>
-        </AppBar>
-      </div>
+        </AppBar >
+      </div >
     );
   }
 
