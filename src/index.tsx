@@ -2,7 +2,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
-import registerServiceWorker from './registerServiceWorker';
 
 import 'typeface-roboto';
 import './index.css';
@@ -17,7 +16,6 @@ function renderApp() {
 }
 
 renderApp();
-registerServiceWorker();
 
 if (module.hot) {
 	module.hot.accept('./App', () => renderApp());

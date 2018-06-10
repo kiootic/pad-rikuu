@@ -19,13 +19,13 @@ const InvalidatedPaths = 'invalidatedPaths';
 const BaseURL = 'baseURL';
 
 export class Storage {
-  private cache: Cache;
+  private cache: Cache | undefined;
   private origin: string;
   private invalidatedPaths: Set<string>;
   private _baseUrl: string;
 
   public async initialize() {
-    this.cache = await caches.open('data');
+    this.cache = window.caches && await caches.open('data');
     this.origin = new URL(process.env.PUBLIC_URL!, window.location.origin).toString();
     this.invalidatedPaths = new Set<string>(JSON.parse(localStorage[InvalidatedPaths] || '[]'));
     // tslint:disable-next-line:no-var-require
@@ -36,29 +36,22 @@ export class Storage {
   public set baseUrl(value: string) { localStorage[BaseURL] = (this._baseUrl = value); }
 
   public async clear() {
-    await caches.delete('data');
+    if (window.caches)
+      await window.caches.delete('data');
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith('data:'))
+        localStorage.removeItem(key);
+    }
   }
 
-  public async setJson<T>(path: string, value: T) {
-    this.setBlob(path, new Blob([JSON.stringify(value)], {
-      type: 'application/json'
-    }));
+  public async setJson<T>(key: string, value: T) {
+    localStorage[`data:${key}`] = JSON.stringify(value);
   }
 
-  public async setBlob(path: string, value: Blob) {
-    this.cache.put(new URL(path, this.origin).toString(), new Response(value));
-  }
-
-  public async getJson<T>(path: string) {
-    const resp: Response | undefined = await caches.match(new URL(path, this.origin).toString());
-    if (!resp) return undefined;
-    return await resp.json() as T;
-  }
-
-  public async getImage(path: string) {
-    const resp: Response | undefined = await caches.match(new URL(path, this.origin).toString());
-    if (!resp) return undefined;
-    return await fetchBlobImage(await resp.blob());
+  public async getJson<T>(key: string) {
+    const data = localStorage[`data:${key}`];
+    if (!data) return undefined;
+    return JSON.parse(data) as T;
   }
 
   public async invalidateResource(path: string) {
@@ -76,13 +69,12 @@ export class Storage {
   }
 
   private async fetch(path: string, opt: CacheOptions) {
-    const cache = await caches.open('data');
     const cacheUrl = new URL(path, this.origin).toString();
 
     if (this.invalidatedPaths.has(path) && opt !== CacheOptions.Ignore)
       opt = CacheOptions.Bypass;
 
-    let resp = opt !== CacheOptions.Ignore && await cache.match(cacheUrl);
+    let resp = opt !== CacheOptions.Ignore && this.cache && await this.cache.match(cacheUrl);
     if (opt === CacheOptions.Normal && resp)
       return resp;
 
@@ -99,7 +91,8 @@ export class Storage {
     }
 
     if (opt !== CacheOptions.Ignore) {
-      await cache.put(cacheUrl, resp.clone());
+      if (this.cache)
+        await this.cache.put(cacheUrl, resp.clone());
       if (this.invalidatedPaths.delete(path))
         localStorage[InvalidatedPaths] = JSON.stringify(Array.from(this.invalidatedPaths.values()));
     }

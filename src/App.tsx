@@ -1,14 +1,13 @@
-import {
-  CssBaseline, Hidden, jssPreset,
-  MuiThemeProvider, Typography
-} from '@material-ui/core';
+import { CssBaseline, Hidden, jssPreset, MuiThemeProvider, Typography } from '@material-ui/core';
 import { create } from 'jss';
 import { observer, Provider } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import * as React from 'react';
 import { JssProvider } from 'react-jss';
 import { BrowserRouter } from 'react-router-dom';
+import { AppNotifications } from 'src/components/app/AppNotifications';
 import { AppRoot } from 'src/components/app/AppRoot';
+import registerServiceWorker from 'src/registerServiceWorker';
 import { Store } from 'src/store';
 import { theme } from 'src/theme';
 import './App.css';
@@ -53,9 +52,12 @@ export class App extends React.Component<AppProps> {
             </MuiThemeProvider>
           </JssProvider>
         </Provider>
-        <Hidden smDown={true}>
-          <DevTools />
-        </Hidden>
+        {
+          process.env.NODE_ENV !== 'production' &&
+          <Hidden smDown={true}>
+            <DevTools position={{ right: 300 }} />
+          </Hidden>
+        }
       </>
     );
   }
@@ -63,6 +65,17 @@ export class App extends React.Component<AppProps> {
   private async loadStore() {
     const store = this.props.store;
     await store.load();
+    registerServiceWorker(swResult => {
+      if (swResult === 'updated') {
+        AppNotifications.show({
+          message: 'Refresh to update application'
+        });
+      } else if (swResult === 'ok') {
+        AppNotifications.show({
+          message: 'You can use the application offline now'
+        });
+      }
+    });
     await store.updater.checkUpdate();
   }
 }
