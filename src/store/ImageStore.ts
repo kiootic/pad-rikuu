@@ -3,7 +3,7 @@ import { action, observable } from 'mobx';
 import { Card } from 'src/models';
 import { getIconSet, IconSize, renderIconSet } from 'src/renderer/CardIconRenderer';
 import { BaseStore } from 'src/store/BaseStore';
-import { CacheOptions, StorageBucket } from 'src/store/Storage';
+import { CacheOptions } from 'src/store/Storage';
 import { setImmediate, transformer } from 'src/utils';
 
 export interface DBEntry {
@@ -56,13 +56,13 @@ export class ImageStore extends BaseStore {
   }
 
   public async fetchImage(entry: Entry, file?: string, cache?: CacheOptions) {
-    const path = `/images/${file || entry.files[0]}`;
-    return await this.root.storage.fetchImage(path, StorageBucket.Picture, cache);
+    const path = `images/${file || entry.files[0]}`;
+    return await this.root.storage.fetchImage(path, cache);
   }
 
   public async fetchJson(entry: Entry, file?: string, cache?: CacheOptions) {
-    const path = `/images/${file || entry.files[0]}`;
-    return await this.root.storage.fetchJson(path, StorageBucket.Picture, cache);
+    const path = `images/${file || entry.files[0]}`;
+    return await this.root.storage.fetchJson(path, cache);
   }
 
   @transformer
@@ -83,7 +83,7 @@ export class ImageStore extends BaseStore {
   }
 
   protected async doLoad() {
-    const extlist = await this.root.storage.fetchJson('/images/extlist.json', StorageBucket.Index);
+    const extlist = await this.root.storage.fetchJson('images/extlist.json');
     this.onLoaded(extlist);
   }
 
@@ -91,16 +91,7 @@ export class ImageStore extends BaseStore {
   private renderIcons(setId: number) {
     this.icons.set(setId, false);
     setImmediate(async () => {
-      const storage = this.root.storage;
-      const iconUrl = `/icons/${setId}.png`;
-
-      let image: IconImageElement | undefined = await storage.getImage(iconUrl, StorageBucket.Icon);
-      if (!image) {
-        const canvas = await renderIconSet(this.root, setId);
-        const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve));
-        await this.root.storage.setItem(iconUrl, StorageBucket.Icon, blob!);
-        image = canvas;
-      }
+      const image = await renderIconSet(this.root, setId);
       this.icons.set(setId, image);
     });
   }

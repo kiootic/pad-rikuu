@@ -1,7 +1,6 @@
 import { action, computed, observable } from 'mobx';
 import { Card, EnemySkill, Skill } from 'src/models';
 import { BaseStore } from 'src/store/BaseStore';
-import { StorageBucket } from 'src/store/Storage';
 
 export interface DataVersions {
   cards: number;
@@ -45,10 +44,10 @@ export class GameDataStore extends BaseStore {
 
   protected async doLoad() {
     const [versions, cards, skills, enemySkills] = await Promise.all([
-      this.root.storage.fetchJson<DataVersions>('/game/version.json', StorageBucket.Index),
-      this.root.storage.fetchJson<Card[]>('/game/cards.json', StorageBucket.GameData),
-      this.root.storage.fetchJson<Skill[]>('/game/skills.json', StorageBucket.GameData),
-      this.root.storage.fetchJson<EnemySkill[]>('/game/enemy-skills.json', StorageBucket.GameData),
+      this.root.storage.fetchJson<DataVersions>('game/version.json'),
+      this.root.storage.fetchJson<Card[]>('game/cards.json'),
+      this.root.storage.fetchJson<Skill[]>('game/skills.json'),
+      this.root.storage.fetchJson<EnemySkill[]>('game/enemy-skills.json'),
     ]);
     this.onLoaded(versions, cards, skills, enemySkills);
   }

@@ -1,5 +1,4 @@
 import { Store } from 'src/store';
-import { CacheOptions } from 'src/store/Storage';
 import { AtlasImage } from 'src/utils';
 
 const ImageSize = 102;
@@ -22,7 +21,7 @@ export function getIconSet(id: number): IconSet {
 
 export async function renderIconSet(store: Store, setId: number) {
   const texId = setId + 1;
-  const iconTex = await store.images.fetchImage(store.images.resolve('cards', texId), undefined, CacheOptions.Ignore);
+  const iconTex = await store.images.fetchImage(store.images.resolve('cards', texId));
 
   const canvas = document.createElement('canvas');
   canvas.width = IconSize * 10;

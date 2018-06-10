@@ -2,8 +2,10 @@ import { action, computed, observable } from 'mobx';
 import { Store } from 'src/store';
 import { DataVersions } from 'src/store/GameDataStore';
 import { DBEntry } from 'src/store/ImageStore';
-import { CacheOptions, StorageBucket } from 'src/store/Storage';
+import { CacheOptions } from 'src/store/Storage';
 import { AppNotifications } from '../components/app/AppNotifications';
+
+const LastUpdated = 'lastUpdated';
 
 export class Updater {
   @observable
@@ -13,21 +15,21 @@ export class Updater {
   public working = false;
 
   @observable
-  private outdatedKeys: Array<[string, StorageBucket]> = [];
+  private outdatedPaths: string[] = [];
 
   @computed
-  public get updateAvailable() { return this.outdatedKeys.length > 0; }
+  public get updateAvailable() { return this.outdatedPaths.length > 0; }
 
   constructor(private readonly store: Store) {
   }
 
   public async initialize() {
-    const lastCheck = await this.store.storage.getItem<string>('/last-update', StorageBucket.Metadata);
-    if (lastCheck) {
-      this.lastUpdated = new Date(lastCheck);
+    const lastUpdated = localStorage[LastUpdated];
+    if (lastUpdated) {
+      this.lastUpdated = new Date(lastUpdated);
     } else {
       this.lastUpdated = new Date();
-      await this.store.storage.setItem('/last-updated', StorageBucket.Metadata, this.lastUpdated.toISOString());
+      localStorage[LastUpdated] = this.lastUpdated.toISOString();
     }
   }
 
@@ -36,34 +38,30 @@ export class Updater {
     if (this.working) return;
 
     const storage = this.store.storage;
-    const outdated = new Set<[string, StorageBucket]>();
+    const outdated = new Set<string>();
     this.working = true;
 
     try {
-      const versions = await storage.fetchJson<DataVersions>(
-        '/game/version.json', StorageBucket.Index, CacheOptions.Ignore
-      );
+      const versions = await storage.fetchJson<DataVersions>('game/version.json', CacheOptions.Ignore);
       for (const dataKey of Object.keys(versions)) {
         if (versions[dataKey] !== this.store.gameData.versions[dataKey]) {
-          outdated.add([`/game/${dataKey}.json`, StorageBucket.GameData]);
-          outdated.add(['/game/version.json', StorageBucket.Index]);
+          outdated.add(`game/${dataKey}.json`);
+          outdated.add('game/version.json');
         }
       }
 
-      const extlist = await storage.fetchJson<DBEntry[]>(
-        '/images/extlist.json', StorageBucket.Index, CacheOptions.Ignore
-      );
+      const extlist = await storage.fetchJson<DBEntry[]>('images/extlist.json', CacheOptions.Ignore);
       for (const entry of extlist) {
         const oldEntry = this.store.images.entries.get(entry.key);
         if (!oldEntry || oldEntry.lastUpdate !== entry.lastUpdate) {
           for (const file of entry.files)
-            outdated.add([`/images/${file}`, StorageBucket.Picture]);
-          outdated.add(['/images/extlist.json', StorageBucket.Index]);
+            outdated.add(`images/${file}`);
+          outdated.add('images/extlist.json');
         }
         if (oldEntry && oldEntry.lastUpdate !== entry.lastUpdate) {
           for (const file of oldEntry.files)
-            outdated.add([`/images/${file}`, StorageBucket.Picture]);
-          outdated.add(['/images/extlist.json', StorageBucket.Index]);
+            outdated.add(`images/${file}`);
+          outdated.add('images/extlist.json');
         }
       }
     } catch (e) {
@@ -75,7 +73,7 @@ export class Updater {
     }
 
     action(() => {
-      this.outdatedKeys = Array.from(outdated.values());
+      this.outdatedPaths = Array.from(outdated.values());
       this.working = false;
     })();
 
@@ -89,7 +87,7 @@ export class Updater {
       });
     } else {
       await action(async () => this.lastUpdated = new Date())();
-      await this.store.storage.setItem('/last-updated', StorageBucket.Metadata, this.lastUpdated.toISOString());
+      localStorage[LastUpdated] = this.lastUpdated.toISOString();
     }
   }
 
@@ -99,21 +97,21 @@ export class Updater {
     this.working = true;
 
     try {
-      for (const [url, bucket] of this.outdatedKeys) {
-        await this.store.storage.invalidateItem(url, bucket);
+      for (const path of this.outdatedPaths) {
+        await this.store.storage.invalidateResource(path);
       }
-      if (this.outdatedKeys.length > 0) {
+      if (this.outdatedPaths.length > 0) {
         await this.store.load(true);
 
         await action(async () => this.lastUpdated = new Date())();
-        await this.store.storage.setItem('/last-updated', StorageBucket.Metadata, this.lastUpdated.toISOString());
+        localStorage[LastUpdated] = this.lastUpdated.toISOString();
         AppNotifications.show({
           message: 'Data updated'
         });
       }
     } finally {
       action(() => {
-        this.outdatedKeys.length = 0;
+        this.outdatedPaths.length = 0;
         this.working = false;
       })();
     }

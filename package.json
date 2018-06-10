@@ -7,7 +7,6 @@
     "downshift": "^1.31.15",
     "font-awesome": "^4.7.0",
     "gl-matrix": "^2.6.1",
-    "localforage": "^1.7.1",
     "lodash": "^4.17.10",
     "material-icons": "^0.2.3",
     "mobx": "^4.3.0",
@@ -45,5 +44,5 @@
     "@types/webpack-env": "^1.13.6",
     "typescript": "^2.8.3"
   },
-  "dataUrl": "https://kiootic.github.io/rikuu-data"
+  "dataUrl": "https://kiootic.github.io/rikuu-data/"
 }

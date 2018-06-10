@@ -72,8 +72,8 @@ export class Data extends React.Component {
   }
 
   @bound
-  private async saveBaseUrl() {
-    await this.store.storage.setBaseUrl(this.baseUrl);
+  private saveBaseUrl() {
+    this.store.storage.baseUrl = this.baseUrl;
   }
 
   @bound
