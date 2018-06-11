@@ -1,12 +1,15 @@
-import { Typography } from '@material-ui/core';
+import { Icon, Typography } from '@material-ui/core';
 import { isEqual, round, uniq } from 'lodash';
 import { computed } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { Asset, AssetBox } from 'src/components/base';
+import { Asset, AssetBox, Popup } from 'src/components/base';
 import { CardIcon } from 'src/components/cards/CardIcon';
 import { Attributes, Curve, Types } from 'src/models';
-import { BindTeamTarget, EnemySkill, EnemySkillKinds, OrbsLocation, OrbsLocationKind, SkillConditionKind, SkillValue } from 'src/models/ParsedEnemySkill';
+import {
+  BindTeamTarget, EnemySkill, EnemySkillKinds,
+  OrbsLocation, OrbsLocationKind, SkillConditionKind, SkillValue
+} from 'src/models/ParsedEnemySkill';
 import { parse } from 'src/parsers/EnemySkillParser';
 import { Store } from 'src/store';
 import { store } from 'src/utils';
@@ -38,15 +41,23 @@ export class EnemySkills extends React.Component<EnemySkillsProps> {
     const skills = this.card.enemy.skills
       .map(skill => parse(id => this.store.gameData.getEnemySkill(id), skill.id, skill.ai, skill.rnd));
 
+    if (skills.length === 0)
+      return 'none';
+
     const data = {
       atk: Curve.valueAt(this.level, this.card.enemy.maxLevel, this.card.enemy.atk)
     };
 
     return (
       <ol className="EnemySkills-root">{
-        skills.map((actions, i) => <li className="EnemySkills-action-item" key={i}>
-          <span className="EnemySkills-action-ord">{i + 1}</span>
-          {renderActions(actions, data)}
+        skills.map((action, i) => <li className="EnemySkills-action-item" key={i}>
+          <div className="EnemySkills-action-label">
+            {i + 1}
+            <Popup className="EnemySkills-raw-icon" anchor="right" header={<Icon>code</Icon>}>
+              <div className="EnemySkills-raw-data">{JSON.stringify(action, null, 4)}</div>
+            </Popup>
+          </div>
+          {renderActions(action, data)}
         </li>)
       }</ol>
     );
@@ -109,40 +120,41 @@ function renderActions(action: EnemySkill | EnemySkill[], data: EnemyData): Reac
   } else {
     return (
       <div className="EnemySkills-action">
+        <Typography variant="caption" className="EnemySkills-action-header">{
+          (
+            action.conditions && action.conditions.map((cond) => {
+              switch (cond.kind) {
+                case SkillConditionKind.EnemyRemains: return `${cond.value} enemies remain`;
+                case SkillConditionKind.AfterTurns: return `after ${cond.value} turns`;
+                case SkillConditionKind.FlagSet: return `flag ${cond.value} is set`;
+                case SkillConditionKind.FlagUnset: return `flag ${cond.value} is not set`;
+
+                case SkillConditionKind.Preemptive: return 'preemptive action';
+                case SkillConditionKind.OnDeath: return 'on death';
+
+                case SkillConditionKind.HPLessThan: return `HP \u2264 ${round(cond.value * 100, 2)}%`;
+                case SkillConditionKind.HPGreaterThan: return `HP \u2265 ${round(cond.value * 100, 2)}%`;
+
+                case SkillConditionKind.CounterLessThan: return `counter \u2264 ${cond.value}`;
+                case SkillConditionKind.CounterIs: return `counter = ${cond.value}`;
+                case SkillConditionKind.CounterGreaterThan: return `counter \u2265 ${cond.value}`;
+
+                case SkillConditionKind.LevelLessThan: return `level \u2264 ${cond.value}`;
+                case SkillConditionKind.LevelIs: return `level = ${cond.value}`;
+                case SkillConditionKind.LevelGreaterThan: return `level \u2265 ${cond.value}`;
+
+                case SkillConditionKind.ComboGreaterThan: return `combo count last turn \u2265 ${cond.value}`;
+              }
+            }) || []
+          ).concat(
+            action.prob && action.prob !== 1 && `${round(action.prob * 100, 2)}% chance` || '',
+            action.baseProb && `${round(action.baseProb * 100, 2)}% base chance` || ''
+          ).filter(d => d.length > 0).join('; ')
+        }</Typography>
         <div className="EnemySkills-action-header">
           {action.title && <Typography variant="subheading">{action.title}</Typography>}
-          {action.message && <Typography variant="caption">{action.message}</Typography>}
-          {(action.conditions && action.conditions.length > 0) &&
-            <Typography variant="caption" className="EnemySkills-condition">{
-              action.conditions.map((cond, i) => {
-                switch (cond.kind) {
-                  case SkillConditionKind.EnemyRemains: return `${cond.value} enemies remain`;
-                  case SkillConditionKind.AfterTurns: return `after ${cond.value} turns`;
-                  case SkillConditionKind.FlagSet: return `flag ${cond.value} is set`;
-                  case SkillConditionKind.FlagUnset: return `flag ${cond.value} is not set`;
-
-                  case SkillConditionKind.Preemptive: return 'preemptive action';
-                  case SkillConditionKind.OnDeath: return 'on death';
-
-                  case SkillConditionKind.HPLessThan: return `HP < ${round(cond.value * 100, 2)}%`;
-                  case SkillConditionKind.HPGreaterThan: return `HP > ${round(cond.value * 100, 2)}%`;
-
-                  case SkillConditionKind.CounterLessThan: return `counter < ${cond.value}`;
-                  case SkillConditionKind.CounterIs: return `counter = ${cond.value}`;
-                  case SkillConditionKind.CounterGreaterThan: return `counter > ${cond.value}`;
-
-                  case SkillConditionKind.LevelLessThan: return `level < ${cond.value}`;
-                  case SkillConditionKind.LevelIs: return `level = ${cond.value}`;
-                  case SkillConditionKind.LevelGreaterThan: return `level > ${cond.value}`;
-
-                  case SkillConditionKind.ComboGreaterThan: return `combo count last turn > ${cond.value}`;
-                }
-              }).join('; ')
-            }</Typography>
-          }
-          {(action.prob || action.baseProb || undefined) && <Typography variant="caption" className="EnemySkills-prob">
-            {action.prob && `${round(action.prob * 100, 2)}% chance` || undefined}
-            {action.baseProb && ` (${round(action.baseProb * 100, 2)}% base chance)` || undefined}
+          {action.message && <Typography variant="caption" style={{ whiteSpace: 'pre' }}>
+            {action.message.replace('|', '\n')}
           </Typography>}
         </div>
         {renderSkill(action, data)}
@@ -195,6 +207,18 @@ function renderSkill(action: EnemySkill, data: EnemyData): React.ReactNode {
     case EnemySkillKinds.WithTurns: {
       const { turns, skill } = action as EnemySkill.WithTurns;
       children = <>{renderSkill(skill, data)} for {renderValue(turns)} turns</>;
+      break;
+    }
+    case EnemySkillKinds.Sequence: {
+      const { value } = action as EnemySkill.WithValue<EnemySkill[]>;
+      children = <div className="EnemySkills-action-sequence">
+        {renderActions(value, data)}
+      </div>;
+      break;
+    }
+    case EnemySkillKinds.Choose: {
+      const { value } = action as EnemySkill.WithValue<EnemySkill[]>;
+      children = renderActions(value, data);
       break;
     }
     case EnemySkillKinds.PowerHit: {
@@ -548,9 +572,10 @@ function renderSkill(action: EnemySkill, data: EnemyData): React.ReactNode {
       break;
     }
     case EnemySkillKinds.Nop: {
-      return <></>;
+      children = 'do nothing';
+      break;
     }
   }
 
-  return <span className="EnemySkills-skill">{children}</span>;
+  return <div className="EnemySkills-skill">{children}</div>;
 }

@@ -87,7 +87,7 @@ export class EnemyDetails extends React.Component<EnemyDetailsProps> {
           </div>
         </>)}
         {section('Stats', 'stats', <EnemyStats id={card.id} level={this.selectedLevel} selectLevel={this.selectLevel} />)}
-        {section('Skills', 'skills', <EnemySkills id={card.id} level={this.selectedLevel} />)}
+        {section('Actions', 'skills', <EnemySkills id={card.id} level={this.selectedLevel} />)}
       </article>
     );
   }

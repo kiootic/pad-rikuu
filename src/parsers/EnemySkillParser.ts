@@ -6,22 +6,21 @@ import {
 } from 'src/models/ParsedEnemySkill';
 import { parseFlags as flags } from 'src/utils';
 
-type SkillParser = (id: number) => Skill[];
-type ParsedSkill = Skill | Array<Skill | null>;
+type SkillParser = (id: number) => Skill;
 type SkillParsers = {
   parser: SkillParser;
   ai: number;
   rnd: number;
-} & { [type: number]: (...params: number[]) => ParsedSkill };
+} & { [type: number]: (...params: number[]) => Skill };
 
 /* tslint:disable:no-bitwise */
 
-export function parse(lookup: (id: number) => SkillData | undefined, id: number, ai: number, rnd: number): Skill[] {
+export function parse(lookup: (id: number) => SkillData | undefined, id: number, ai: number, rnd: number): Skill {
   // tslint:disable-next-line:no-shadowed-variable
-  function parser(skillId: number, ai?: number, rnd?: number): Skill[] {
+  function parser(skillId: number, ai?: number, rnd?: number): Skill {
     const skill = lookup(skillId);
     if (!skill) {
-      return [{ id: skillId, kind: SkillKinds.Unknown }];
+      return { id: skillId, kind: SkillKinds.Unknown };
     }
 
     const params = skill.params.slice(1).map(value => (value || 0) as number);
@@ -32,34 +31,47 @@ export function parse(lookup: (id: number) => SkillData | undefined, id: number,
     };
 
     if (!parsers[skill.type]) {
-      return [{ ...skillBase, kind: SkillKinds.Unknown }];
+      return { ...skillBase, kind: SkillKinds.Unknown };
     }
 
-    const result: ParsedSkill = parsers[skill.type].apply({ parser, ai, rnd }, params);
-    let resultSkills = (Array.isArray(result) ? result.filter(Boolean) as Skill[] : [result]);
+    let result: Skill = parsers[skill.type].apply({ parser, ai, rnd }, params);
+    if ([
+      SkillKinds.CheckPresence,
+      SkillKinds.Branch,
+      SkillKinds.UpdateVar,
+      SkillKinds.Stop,
+      SkillKinds.Nop,
+      SkillKinds.Sequence,
+      SkillKinds.Choose,
+    ].indexOf(result.kind) < 0) {
+      const insertSkill = (s: Skill, last: boolean) => {
+        if (result.kind !== SkillKinds.Sequence) {
+          const conds = result.conditions;
+          result.conditions = undefined;
+          result = sequence(result);
+          result.conditions = conds;
+        }
+        const seq = (result as Skill.WithValue<Skill[]>).value;
+        seq.splice(last ? seq.length : 0, 0, s);
+      };
 
-    if (params[10])
-      resultSkills = resultSkills.map(s => cond.hpLess(params[10] / 100, s));
-    if (params[12]) {
-      resultSkills = resultSkills.map(s => cond.flagUnset(params[12], s));
-      resultSkills.push(updateVar('flags', 'set', params[12]));
-    }
-    if (params[13])
-      resultSkills.push(hit(v.constant(1), params[13] / 100));
+      if (params[10])
+        result = cond.hpLess(params[10] / 100, result);
+      if (params[12]) {
+        insertSkill(updateVar('flags', 'set', params[12]), true);
+        result = cond.flagUnset(params[12], result);
+      }
+      if (params[13]) {
+        insertSkill(hit(v.constant(1), params[13] / 100), false);
+      }
 
-    for (const s of resultSkills) {
-      if (s.kind === SkillKinds.CheckPresence || s.kind === SkillKinds.Branch || s.kind === SkillKinds.UpdateVar)
-        continue;
-      s.prob = ai && ai / 100;
-      s.baseProb = rnd && rnd / 100;
+      result.prob = ai && ai / 100;
+      result.baseProb = rnd && rnd / 100;
     }
 
-    if (resultSkills.length > 0) {
-      const title = skill.name;
-      const message = skill.params[0] || undefined;
-      resultSkills[0] = { ...skillBase, ai, rnd, title, message, ...resultSkills[0] };
-    }
-    return resultSkills;
+    const title = skill.name;
+    const message = skill.params[0] || undefined;
+    return { ...skillBase, ai, rnd, title, message, ...result };
   }
 
   return parser(id, ai, rnd);
@@ -101,58 +113,58 @@ namespace loc {
 }
 
 namespace cond {
-  function withCondition(kind: SkillConditionKind, value: number, skill: Skill): Skill {
+  function withCondition<T extends Skill>(kind: SkillConditionKind, value: number, skill: T): T {
     if (!skill.conditions)
       skill.conditions = [];
     skill.conditions.push({ kind, value });
     return skill;
   }
 
-  export function enemyRemains(count: number, skill: Skill) {
+  export function enemyRemains<T extends Skill>(count: number, skill: T) {
     return withCondition(SkillConditionKind.EnemyRemains, count, skill);
   }
-  export function afterTurns(count: number, skill: Skill) {
+  export function afterTurns<T extends Skill>(count: number, skill: T) {
     return withCondition(SkillConditionKind.AfterTurns, count, skill);
   }
-  export function flagSet(flag: number, skill: Skill) {
+  export function flagSet<T extends Skill>(flag: number, skill: T) {
     return withCondition(SkillConditionKind.FlagSet, flag, skill);
   }
-  export function flagUnset(flag: number, skill: Skill) {
+  export function flagUnset<T extends Skill>(flag: number, skill: T) {
     return withCondition(SkillConditionKind.FlagUnset, flag, skill);
   }
 
-  export function hpLess(percent: number, skill: Skill) {
+  export function hpLess<T extends Skill>(percent: number, skill: T) {
     return withCondition(SkillConditionKind.HPLessThan, percent, skill);
   }
-  export function hpGreater(percent: number, skill: Skill) {
+  export function hpGreater<T extends Skill>(percent: number, skill: T) {
     return withCondition(SkillConditionKind.HPGreaterThan, percent, skill);
   }
-  export function counterLess(value: number, skill: Skill) {
+  export function counterLess<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.CounterLessThan, value, skill);
   }
-  export function counterIs(value: number, skill: Skill) {
+  export function counterIs<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.CounterIs, value, skill);
   }
-  export function counterGreater(value: number, skill: Skill) {
+  export function counterGreater<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.CounterGreaterThan, value, skill);
   }
-  export function levelLess(value: number, skill: Skill) {
+  export function levelLess<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.LevelLessThan, value, skill);
   }
-  export function levelIs(value: number, skill: Skill) {
+  export function levelIs<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.LevelIs, value, skill);
   }
-  export function levelGreater(value: number, skill: Skill) {
+  export function levelGreater<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.LevelGreaterThan, value, skill);
   }
-  export function comboGreater(value: number, skill: Skill) {
+  export function comboGreater<T extends Skill>(value: number, skill: T) {
     return withCondition(SkillConditionKind.ComboGreaterThan, value, skill);
   }
 
-  export function whenPreemptive(skill: Skill) {
+  export function whenPreemptive<T extends Skill>(skill: T) {
     return withCondition(SkillConditionKind.Preemptive, 0, skill);
   }
-  export function whenDeath(skill: Skill) {
+  export function whenDeath<T extends Skill>(skill: T) {
     return withCondition(SkillConditionKind.OnDeath, 0, skill);
   }
 }
@@ -168,8 +180,25 @@ function preemptive(skill?: Skill): Skill {
   return skill ? cond.whenPreemptive(skill) : { kind: SkillKinds.Preemptive };
 }
 
-function onDeath(...skills: Skill[]): Skill[] {
-  return skills.map(skill => cond.whenDeath(skill));
+function onDeath(...skills: Skill[]): Skill.WithValue<Skill[]> {
+  return cond.whenDeath({
+    kind: SkillKinds.Sequence,
+    value: skills
+  });
+}
+
+function choose(skills: Array<Skill | null>): Skill.WithValue<Skill[]> {
+  return {
+    kind: SkillKinds.Choose,
+    value: skills.filter(Boolean) as Skill[]
+  };
+}
+
+function sequence(...skills: Array<Skill | null>): Skill.WithValue<Skill[]> {
+  return {
+    kind: SkillKinds.Sequence,
+    value: skills.filter(Boolean) as Skill[]
+  };
 }
 
 function bind(team?: { flags: number, count: number }, attrs?: Attributes[], types?: Types[]): Skill.Bind {
@@ -334,21 +363,22 @@ function eraseBuffs(): Skill { return { kind: SkillKinds.EraseBuffs }; }
 function bindSkills(): Skill { return { kind: SkillKinds.BindSkills }; }
 function bindAwakenings(): Skill { return { kind: SkillKinds.BindAwakenings }; }
 function selfDestruct(): Skill { return { kind: SkillKinds.SelfDestruct }; }
-function transform(): Skill { return { kind: SkillKinds.Transform }; }
+function transform(): Skill { return { kind: SkillKinds.Animation }; }
 function leaderChange(): Skill { return { kind: SkillKinds.LeaderChange }; }
 function fixTarget(): Skill { return { kind: SkillKinds.FixTarget }; }
-function ffplay(): Skill { return { kind: SkillKinds.FFPlay }; }
+function ffplay(): Skill { return { kind: SkillKinds.FFAnimation }; }
 function stop(): Skill { return { kind: SkillKinds.Stop }; }
 function displayCounter(): Skill { return { kind: SkillKinds.DisplayCounter }; }
 
 const parsers: SkillParsers = {
-  parser: (() => []) as SkillParser,
+  parser: () => ({} as Skill),
   ai: 0, rnd: 0,
 
+  [0]() { return nop(); },
   [1](count, min, max) { return withTurns(v.range(min, max), bind({ flags: 7, count })); },
   [2](attr, min, max) { return withTurns(v.range(min, max), bind(undefined, [attr])); },
   [3](type, min, max) { return withTurns(v.range(min, max), bind(undefined, undefined, [type])); },
-  [4](from, to) { return changeOrbs({ from: loc.attributes([from]), to: [to] }); },
+  [4](from, to) { return changeOrbs({ from: from === -1 ? loc.all() : loc.attributes([from]), to: [to] }); },
   [5]() { return setOrbState(loc.all(), 'blind'); },
   [6]() { return eraseBuffs(); },
   [7](min, max) { return heal(v.range(min / 100, max / 100), 'self'); },
@@ -393,12 +423,12 @@ const parsers: SkillParsers = {
   [46](attr1, attr2, attr3, attr4, attr5) { return changeAttribute(attr1, attr2, attr3, attr4, attr5); },
   [47](_, mul) { return preemptive(hit(v.constant(1), mul / 100)); },
   [48](mul, from, to) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       changeOrbs({ from: from === -1 ? loc.attributes(undefined, 1) : loc.attributes([from]), to: [to] })
-    ];
+    );
   },
-  [49](level) { return cond.levelGreater(level - 1, preemptive()); },
+  [49](level) { return cond.levelGreater(level, preemptive()); },
   [50](mul) { return gravity(v.constant(mul / 100)); },
 
   [52](mul) { return revive(v.constant(mul / 100)); },
@@ -412,22 +442,22 @@ const parsers: SkillParsers = {
   [60](count) { return changeOrbs({ from: loc.random(v.constant(count)), to: [Attributes.Poison] }); },
 
   [62](mul) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       setOrbState(loc.all(), 'blind')
-    ];
+    );
   },
   [63](mul, min, max, target, count) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       withTurns(v.range(min, max), bind({ flags: target || 7, count }))
-    ];
+    );
   },
   [64](mul, count) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       changeOrbs({ from: loc.random(v.constant(count)), to: [Attributes.Poison] })
-    ];
+    );
   },
   [65](count, min, max) { return withTurns(v.range(min, max), bind({ flags: 4, count })); },
   [66]() { return nop(); },
@@ -441,52 +471,52 @@ const parsers: SkillParsers = {
   [74](turns, mul) { return withTurns(v.constant(turns), reduceDamage(v.constant(mul / 100))); },
   [75](turns) { return withTurns(v.constant(turns), leaderChange()); },
   [76](col1, attrs1, col2, attrs2, col3, attrs3, col4, attrs4) {
-    return [
+    return sequence(
       col1 && changeOrbs({ from: loc.columns(col1), to: flags(attrs1) }) || null,
       col2 && changeOrbs({ from: loc.columns(col2), to: flags(attrs2) }) || null,
       col3 && changeOrbs({ from: loc.columns(col3), to: flags(attrs3) }) || null,
       col4 && changeOrbs({ from: loc.columns(col4), to: flags(attrs4) }) || null
-    ];
+    );
   },
   [77](col1, attrs1, col2, attrs2, col3, attrs3, mul) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       col1 && changeOrbs({ from: loc.columns(col1), to: flags(attrs1) }) || null,
       col2 && changeOrbs({ from: loc.columns(col2), to: flags(attrs2) }) || null,
       col3 && changeOrbs({ from: loc.columns(col3), to: flags(attrs3) }) || null
-    ];
+    );
   },
   [78](row1, attrs1, row2, attrs2, row3, attrs3, row4, attrs4) {
-    return [
+    return sequence(
       row1 && changeOrbs({ from: loc.rows(row1), to: flags(attrs1) }) || null,
       row2 && changeOrbs({ from: loc.rows(row2), to: flags(attrs2) }) || null,
       row3 && changeOrbs({ from: loc.rows(row3), to: flags(attrs3) }) || null,
       row4 && changeOrbs({ from: loc.rows(row4), to: flags(attrs4) }) || null
-    ];
+    );
   },
   [79](row1, attrs1, row2, attrs2, row3, attrs3, mul) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       row1 && changeOrbs({ from: loc.rows(row1), to: flags(attrs1) }) || null,
       row2 && changeOrbs({ from: loc.rows(row2), to: flags(attrs2) }) || null,
       row3 && changeOrbs({ from: loc.rows(row3), to: flags(attrs3) }) || null
-    ];
+    );
   },
 
   [81](mul, ...attrs) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       changeOrbs({ from: loc.all(), to: attrs.slice(0, attrs.indexOf(-1)) })
-    ];
+    );
   },
   [82]() { return hit(v.constant(1), 1); },
-  [83](...ids) { return flatMap(ids.slice(0, ids.indexOf(0)), id => this.parser(id)); },
+  [83](...ids) { return choose(flatMap(ids.slice(0, ids.indexOf(0)), id => this.parser(id))); },
   [84](attrs) { return changeOrbs({ from: loc.all(), to: flags(attrs) }); },
   [85](mul, attrs) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       changeOrbs({ from: loc.all(), to: flags(attrs) })
-    ];
+    );
   },
   [86](min, max) { return heal(v.range(min / 100, max / 100), 'self'); },
   [87](turns, damage) { return withTurns(v.constant(turns), buff({ damageAbsorb: damage })); },
@@ -497,7 +527,7 @@ const parsers: SkillParsers = {
   [92](count, attrs, exclude) { return changeOrbs({ from: loc.random(v.constant(count)), to: flags(attrs), exclude: flags(exclude) }); },
   [93]() { return ffplay(); },
   [94](attrs, count) { return setOrbState(loc.attributes(flags(attrs), count), 'locked'); },
-  [95](id) { return onDeath(...this.parser(id)); },
+  [95](id) { return onDeath(this.parser(id)); },
   [96](attrs, min, max, mul) { return withTurns(v.range(min, max), orbDropIncrease(mul / 100, attrs === -1 ? Attributes.orbs() : flags(attrs), true)); },
   [97](turns, min, max) { return setOrbState(loc.random(v.range(min, max)), 'super-blind', turns); },
   [98](turns, row1, row2, row3, row4, row5) { return setOrbState(loc.specified(row1, row2, row3, row4, row5), 'super-blind', turns); },
@@ -511,10 +541,10 @@ const parsers: SkillParsers = {
   [106](mul, turns) { return cond.hpLess(mul / 100, changeInterval(turns)); },
   [107](turns, attrs) { return withTurns(v.constant(turns), forbidOrbs(flags(attrs))); },
   [108](mul, from, to) {
-    return [
+    return sequence(
       hit(v.constant(1), mul / 100),
       changeOrbs({ from: loc.attributes(flags(from)), to: flags(to) })
-    ];
+    );
   },
   [109](turns, time, count) { return withTurns(v.constant(turns), rotateOrbs(loc.random(v.constant(count)), time / 100)); },
   [110](turns, time, row1, row2, row3, row4, row5) { return withTurns(v.constant(turns), rotateOrbs(loc.specified(row1, row2, row3, row4, row5), time / 100)); },

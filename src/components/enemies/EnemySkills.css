@@ -2,15 +2,20 @@
   padding: 0;
 }
 
-.EnemySkills-action-item {
-  list-style: none;
-  padding: 8px;
+.EnemySkills-action {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
 }
 
-.EnemySkills-action-ord {
+.EnemySkills-action-item {
+  list-style: none;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #808080;
+}
+
+.EnemySkills-action-label {
   width: 32px;
   text-align: center;
   margin-right: 16px;
@@ -31,16 +36,18 @@
   display: flex;
   flex-direction: row;
   align-items: baseline;
-  margin-top: 16px;
 }
-
 .EnemySkills-action-header > h3 {
-  min-width: 300px;
+  margin-right: 32px;
+}
+.EnemySkills-action-header:nth-child(2) {
+  margin-bottom: 8px;
 }
 
-.EnemySkills-condition, .EnemySkills-prob {
-  margin-left: 32px;
+.EnemySkills-skill {
+  display: inline-block;
 }
+
 .EnemySkills-condition:last-child, .EnemySkills-prob:last-child {
   flex: 1;
   text-align: right;
@@ -50,8 +57,17 @@
 .EnemySkills-action {
   flex: 1;
 }
-.EnemySkills-action > :not(.EnemySkills-action-header) {
+.EnemySkills-skill {
   margin-left: 32px;
+  min-height: 32px;
+}
+.EnemySkills-skill > .EnemySkills-skill {
+  margin-left: 0;
+}
+
+.EnemySkills-action-sequence {
+  border: 1px solid #606060;
+  padding: 8px;
 }
 
 .EnemySkills-icon, .EnemySkills-icon-box {
@@ -70,4 +86,26 @@
   display: inline-flex;
   flex-direction: row;
   vertical-align: middle;
+}
+
+.EnemySkills-raw-icon {
+  margin-top: 8px;
+}
+.EnemySkills-raw-data {
+  white-space: pre;
+  font-family: monospace;
+  padding: 16px;
+  min-width: 400px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+  .EnemySkills-skill {
+    margin-left: 0;
+  }
+
+  .EnemySkills-action-header {
+    flex-direction: column;
+  }
 }
