@@ -68,7 +68,7 @@ export class App extends React.Component<AppProps> {
   private async loadStore() {
     const store = this.props.store;
     await store.load();
-    registerServiceWorker(swResult => {
+    await registerServiceWorker(swResult => {
       if (swResult === 'updated') {
         AppNotifications.show({
           message: 'Refresh to update application'

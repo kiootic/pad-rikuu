@@ -41,13 +41,7 @@ export class Data extends React.Component {
         <div className="Data-field">
           <Typography variant="caption" component="label">Last updated:</Typography>
           {this.store.updater.lastUpdated.toLocaleString()}
-          {actionButton(
-            this.store.updater.working,
-            this.update,
-            this.store.updater.updateAvailable ?
-              <>update data<Icon style={{ marginLeft: 4 }}>update</Icon></> :
-              'check update'
-          )}
+          {actionButton(this.store.updater.working, this.update, 'check update')}
           {actionButton(this.clearState === 1, this.clearData, 'clear cache')}
           <Fade in={this.clearState === 2} timeout={500}><Icon>done</Icon></Fade>
         </div>
@@ -78,15 +72,11 @@ export class Data extends React.Component {
 
   @bound
   private async update() {
-    if (this.store.updater.updateAvailable) {
-      await this.store.updater.updateData();
-    } else {
-      await this.store.updater.checkUpdate();
-      if (!this.store.updater.updateAvailable)
-        AppNotifications.show({
-          message: 'Data is up to date'
-        });
-    }
+    await this.store.updater.checkUpdate();
+    if (!this.store.updater.updateAvailable)
+      AppNotifications.show({
+        message: 'Data is up to date'
+      });
   }
 
   @bound

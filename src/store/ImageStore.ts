@@ -91,8 +91,15 @@ export class ImageStore extends BaseStore {
   private renderIcons(setId: number) {
     this.icons.set(setId, false);
     setImmediate(async () => {
-      const image = await renderIconSet(this.root, setId);
-      this.icons.set(setId, image);
+      try {
+        const image = await renderIconSet(this.root, setId);
+        this.icons.set(setId, image);
+      } catch {
+        setTimeout(() => {
+          if (!this.icons.get(setId))
+            this.icons.delete(setId);
+        }, 5000);
+      }
     });
   }
 

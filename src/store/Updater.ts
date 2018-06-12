@@ -1,9 +1,10 @@
 import { action, computed, observable } from 'mobx';
+import { AppNotifications } from 'src/components/app/AppNotifications';
 import { Store } from 'src/store';
 import { DataVersions } from 'src/store/GameDataStore';
 import { DBEntry } from 'src/store/ImageStore';
 import { CacheOptions } from 'src/store/Storage';
-import { AppNotifications } from '../components/app/AppNotifications';
+import { timeout } from 'src/utils';
 
 const LastUpdated = 'lastUpdated';
 
@@ -77,34 +78,28 @@ export class Updater {
       this.working = false;
     })();
 
-    if (this.updateAvailable) {
-      AppNotifications.show({
-        message: 'Data update available',
-        action: {
-          content: 'Update',
-          fn: this.updateData
-        }
-      });
-    } else {
-      await action(async () => this.lastUpdated = new Date())();
-      localStorage[LastUpdated] = this.lastUpdated.toISOString();
-    }
+    if (this.updateAvailable)
+      await this.updateData();
+
+    await action(async () => this.lastUpdated = new Date())();
+    localStorage[LastUpdated] = this.lastUpdated.toISOString();
   }
 
   @action.bound
-  public async updateData() {
+  private async updateData() {
     if (this.working) return;
     this.working = true;
+
+    AppNotifications.show({
+      message: 'Updating data...'
+    });
 
     try {
       for (const path of this.outdatedPaths) {
         await this.store.storage.invalidateResource(path);
       }
       if (this.outdatedPaths.length > 0) {
-        await this.store.load(true);
-
-        await action(async () => this.lastUpdated = new Date())();
-        localStorage[LastUpdated] = this.lastUpdated.toISOString();
+        await Promise.all([timeout(1000), this.store.load(true)]);
         AppNotifications.show({
           message: 'Data updated'
         });
