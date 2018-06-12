@@ -5,4 +5,4 @@ export * from './Attributes';
 export * from './Types';
 export * from './EnemySkill';
 export * from './Dungeon';
-export * from './DungeonInfo';
+export * from './DungeonData';

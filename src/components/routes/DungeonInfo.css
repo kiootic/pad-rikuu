@@ -1,0 +1,13 @@
+.DungeonInfo-root {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  padding: 16px;
+  justify-content: center;
+}
+
+.DungeonInfo-content {
+  flex: 1;
+  max-width: 900px;
+  position: relative;
+}

@@ -29,9 +29,9 @@ export class CardIcon extends React.Component<CardIconProps> {
 
     let content: JSX.Element;
     if (!this.store.images.getIcon(this.props.id))
-      content = <div style={style} className={this.props.className}><div className="CardIcon-loading" /></div>;
+      content = <div style={style} className={this.props.className || ''}><div className="CardIcon-loading" /></div>;
     else
-      content = <div style={style} className={this.props.className}>
+      content = <div style={style} className={this.props.className || ''}>
         <Canvas className="CardIcon-canvas" width={IconSize} height={IconSize} render={this.renderIcon} />
       </div>;
 

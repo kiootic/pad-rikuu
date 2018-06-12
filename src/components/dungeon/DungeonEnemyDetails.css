@@ -1,0 +1,30 @@
+.DungeonEnemyDetails-root {
+  display: flex;
+}
+.DungeonEnemyDetails-content {
+  flex: 1;
+}
+.DungeonEnemyDetails-stats {
+  display: flex;
+  flex-flow: row wrap;
+}
+.DungeonEnemyDetails-stats-entry {
+  min-height: 40px;
+  width: 25%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.DungeonEnemyDetails-stats-header {
+  font-weight: bold;
+  width: 50%;
+}
+.DungeonEnemyDetails-stats-value {
+  width: 50%;
+}
+
+.DungeonEnemyDetails-drops {
+  display: flex;
+  align-items: center;
+  padding: 2px 16px;
+}

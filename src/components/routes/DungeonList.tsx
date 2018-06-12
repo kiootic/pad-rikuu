@@ -19,6 +19,18 @@ const tabs: Array<{ label: string, types: number[] }> = [
   { label: 'Multiplayer', types: [5, 7] },
 ];
 
+const weekdays = [
+  '',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  '',
+  '',
+  'Weekend',
+];
+
 type Props = RouteComponentProps<{ dungeon?: string }>;
 
 @inject('store')
@@ -91,7 +103,7 @@ export class DungeonList extends React.Component<Props> {
             }
 
             if (dungeon.weekday !== 0)
-              badge = 'weekday';
+              badge = weekdays[dungeon.weekday];
             else if (dungeon.once)
               badge = 'once';
 

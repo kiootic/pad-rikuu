@@ -1,4 +1,4 @@
-export interface DungeonInfo {
+export interface DungeonData {
   dungeon: number;
   floor: number;
 
@@ -12,6 +12,7 @@ export interface DungeonInvade {
 }
 
 export interface DungeonWave {
+  type: 'template' | 'random';
   minEnemies: number;
   maxEnemies: number;
   enemies: DungeonEnemy[];

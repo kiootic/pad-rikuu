@@ -49,8 +49,9 @@ function analyzeFloor(dungeon: number, floor: number, data: string[]): DungeonIn
   for (let i = 0; i < numWaves; i++) {
     const waveSamples = samples.map(waves => waves[i]);
 
+    const type = waveSamples.map(wave => isSameEnemies(wave, waveSamples[0])).every(Boolean) ? 'template' : 'random';
     const allEnemies = flatten(waveSamples);
-    const uniqueEnemies = uniqWith(allEnemies, isSameEnemy);
+    const uniqueEnemies = type === 'template' ? waveSamples[0] : uniqWith(allEnemies, isSameEnemy);
 
     const waveEnemies: DungeonEnemy[] = [];
     for (const enemy of uniqueEnemies) {
@@ -67,7 +68,7 @@ function analyzeFloor(dungeon: number, floor: number, data: string[]): DungeonIn
         if (!waveEnemy.drops.some(({ id, level }) => id === instance.dropId && level === instance.dropLevel))
           waveEnemy.drops.push({
             id: instance.dropId,
-            level: instance.level
+            level: instance.dropLevel
           });
       }
       waveEnemies.push(waveEnemy);
@@ -78,6 +79,7 @@ function analyzeFloor(dungeon: number, floor: number, data: string[]): DungeonIn
     const maxSize = max(waveSizes)!;
 
     const waveInfo: DungeonWave = {
+      type,
       minEnemies: minSize,
       maxEnemies: maxSize,
       enemies: waveEnemies
@@ -85,6 +87,10 @@ function analyzeFloor(dungeon: number, floor: number, data: string[]): DungeonIn
     info.waves.push(waveInfo);
   }
   return info;
+}
+
+function isSameEnemies(a: Enemy[], b: Enemy[]) {
+  return a.length === b.length && a.map((enemy, i) => isSameEnemy(enemy, b[i])).every(Boolean);
 }
 
 function isSameEnemy(a: Enemy, b: Enemy) {

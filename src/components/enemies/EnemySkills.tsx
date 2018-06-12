@@ -18,6 +18,7 @@ import './EnemySkills.css';
 export interface EnemySkillsProps {
   id: number;
   level: number;
+  showPlaceholder?: boolean;
 }
 
 @inject('store')
@@ -41,7 +42,7 @@ export class EnemySkills extends React.Component<EnemySkillsProps> {
     const skills = this.card.enemy.skills
       .map(skill => parse(id => this.store.gameData.getEnemySkill(id), skill.id, skill.ai, skill.rnd));
 
-    if (skills.length === 0)
+    if (skills.length === 0 && this.props.showPlaceholder)
       return 'none';
 
     const data = {

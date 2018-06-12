@@ -59,7 +59,7 @@ export class EnemyDetails extends React.Component<EnemyDetailsProps> {
     }
 
     return (
-      <article className={`${this.props.className} EnemyDetails-root`}>
+      <article className={`${this.props.className || ''} EnemyDetails-root`}>
         {section('', 'image', <>
           <CardImage id={card.id} />
         </>)}
@@ -87,7 +87,7 @@ export class EnemyDetails extends React.Component<EnemyDetailsProps> {
           </div>
         </>)}
         {section('Stats', 'stats', <EnemyStats id={card.id} level={this.selectedLevel} selectLevel={this.selectLevel} />)}
-        {section('Actions', 'skills', <EnemySkills id={card.id} level={this.selectedLevel} />)}
+        {section('Actions', 'skills', <EnemySkills id={card.id} level={this.selectedLevel} showPlaceholder={true} />)}
       </article>
     );
   }

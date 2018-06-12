@@ -46,7 +46,7 @@ export class CardDetails extends React.Component<CardDetailsProps> {
     }
 
     return (
-      <article className={`${this.props.className} CardDetails-root`}>
+      <article className={`${this.props.className || ''} CardDetails-root`}>
         {section('', 'image', <>
           <CardImage id={card.id} />
           <div className="CardDetails-awakenings">

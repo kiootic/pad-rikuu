@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx';
-import { Card, Dungeon, DungeonInfo, EnemySkill, Skill } from 'src/models';
+import { Card, Dungeon, DungeonData, EnemySkill, Skill } from 'src/models';
 import { BaseStore } from 'src/store/BaseStore';
 
 export interface DataVersions {
@@ -25,7 +25,7 @@ export class GameDataStore extends BaseStore {
   @observable.shallow
   private _dungeons: Dungeon[] = [];
   @observable.shallow
-  private _waves: DungeonInfo[] = [];
+  private _waves: DungeonData[] = [];
 
   @observable.shallow
   private readonly _cardMap = new Map<number, Card>();
@@ -62,7 +62,7 @@ export class GameDataStore extends BaseStore {
       this.root.storage.fetchJson<Skill[]>('game/skills.json'),
       this.root.storage.fetchJson<EnemySkill[]>('game/enemy-skills.json'),
       this.root.storage.fetchJson<Dungeon[]>('game/dungeons.json'),
-      this.root.storage.fetchJson<DungeonInfo[]>('game/waves.json'),
+      this.root.storage.fetchJson<DungeonData[]>('game/waves.json'),
     ]);
     this.onLoaded(versions, cards, skills, enemySkills, dungeons, waves);
   }
@@ -71,7 +71,7 @@ export class GameDataStore extends BaseStore {
   private onLoaded(
     versions: DataVersions,
     cards: Card[], skills: Skill[], enemySkills: EnemySkill[],
-    dungeons: Dungeon[], waves: DungeonInfo[]
+    dungeons: Dungeon[], waves: DungeonData[]
   ) {
     this.versions = versions;
 

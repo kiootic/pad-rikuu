@@ -12,6 +12,8 @@
   padding: 16px 8px;
   display: flex;
   flex-direction: row;
+}
+.EnemySkills-action-item:not(:last-child) {
   border-bottom: 1px solid #808080;
 }
 
