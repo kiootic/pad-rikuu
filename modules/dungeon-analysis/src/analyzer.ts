@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { flatten, max, min, uniqWith } from 'lodash';
 import { join } from 'path';
 import { open } from 'sqlite';
@@ -26,6 +26,11 @@ export async function analyze(dataPath: string) {
 
   const result = JSON.stringify(infos, null, 4);
   writeFileSync(join(dataPath, 'game', 'waves.json'), result);
+  if (existsSync(join(dataPath, 'game', 'version.json'))) {
+    const version = JSON.parse(readFileSync(join(dataPath, 'game', 'version.json')).toString('utf8'));
+    version.waves = Date.now();
+    writeFileSync(join(dataPath, 'game', 'version.json'), JSON.stringify(version, null, 4));
+  }
 }
 
 function analyzeFloor(dungeon: number, floor: number, data: string[]): DungeonInfo {

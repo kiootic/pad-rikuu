@@ -12,7 +12,7 @@ export async function downloadWaves(basePath: string, apiUrl: string, info: api.
   const now = moment.tz('Asia/Tokyo');
   const eventDungeons = events
     .filter(event => now.isBetween(event.begin, event.end))
-    .filter(event => event.dungeon && event.type === 6)
+    .filter(event => event.dungeon && (event.type === 6 || event.type === 20))
     .map(event => event.dungeon);
 
   const dateFilter = [

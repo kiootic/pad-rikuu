@@ -1,0 +1,28 @@
+export interface DungeonInfo {
+  dungeon: number;
+  floor: number;
+
+  invades: DungeonInvade[];
+  waves: DungeonWave[];
+}
+
+export interface DungeonInvade {
+  floors: number[];
+  enemy: DungeonEnemy;
+}
+
+export interface DungeonWave {
+  minEnemies: number;
+  maxEnemies: number;
+  enemies: DungeonEnemy[];
+}
+
+export interface DungeonEnemy {
+  id: number;
+  level: number;
+  drops: Array<{
+    id: number;
+    level: number;
+  }>;
+  plus: number;
+}

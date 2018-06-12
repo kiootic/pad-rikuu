@@ -28,6 +28,7 @@ export class AppDrawer extends React.Component<AppDrawerProps> {
     const content = <>
       <List>
         {listItem('Cards', 'collections', '/cards')}
+        {listItem('Dungeons', 'map', '/dungeons')}
       </List>
       <Divider />
       <List>
