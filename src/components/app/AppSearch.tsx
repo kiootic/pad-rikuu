@@ -4,7 +4,7 @@ import { History } from 'history';
 import { action, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { Card } from 'src/models';
+import { Card, Dungeon, Floor } from 'src/models';
 import { Store } from 'src/store';
 import { SearchEntry } from 'src/store/SearchIndexStore';
 import { history, store, transformer, withRouter } from 'src/utils';
@@ -94,7 +94,7 @@ export class AppSearch extends React.Component<AppSearchProps> {
     const candidates: SearchEntry[] = [];
 
     for (const entry of this.store.searchIndex.entries) {
-      if (!entry.text.includes(input))
+      if (!entry.text.toLowerCase().includes(input.toLowerCase()))
         continue;
 
       candidates.push(entry);
@@ -131,6 +131,11 @@ export class AppSearch extends React.Component<AppSearchProps> {
       case 'card': {
         const card = entry.item as Card;
         this.history.push(`/cards/${card.id}`);
+        break;
+      }
+      case 'dungeon': {
+        const { dungeon, floor } = entry.item as { dungeon: Dungeon, floor: Floor };
+        this.history.push(`/dungeons/${dungeon.id}/${floor.id}`);
         break;
       }
     }
