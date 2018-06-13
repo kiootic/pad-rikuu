@@ -5,7 +5,7 @@ import DevTools from 'mobx-react-devtools';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import { JssProvider } from 'react-jss';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { AppNotifications } from 'src/components/app/AppNotifications';
 import { AppRoot } from 'src/components/app/AppRoot';
 import registerServiceWorker from 'src/registerServiceWorker';
@@ -47,9 +47,9 @@ export class App extends React.Component<AppProps> {
               <CssBaseline />
               {
                 !this.props.store.isLoaded ? <Typography className="App-loading" component="div" /> : (
-                  <BrowserRouter>
+                  <HashRouter>
                     <AppRoot />
-                  </BrowserRouter>
+                  </HashRouter>
                 )
               }
             </MuiThemeProvider>

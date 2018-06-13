@@ -2,6 +2,7 @@ import { Icon, IconButton } from '@material-ui/core';
 import { maxBy, minBy } from 'lodash';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { AppHeader } from 'src/components/app/AppHeader';
 import { DungeonDetails } from 'src/components/dungeon/DungeonDetails';
@@ -23,6 +24,9 @@ export class DungeonInfo extends React.Component<RouteComponentProps<{ dungeon: 
     const next = minBy(dungeon.floors.filter(f => f.id > floor), f => f.id);
 
     return <>
+      <Helmet>
+        <title>{`${dungeon.name} - ${dungeon.floors.find(f => f.id === floor)!.name}`}</title>
+      </Helmet>
       <AppHeader>
         <IconButton disabled={!prev} {...{ to: `/dungeons/${dungeon.id}/${prev && prev.id}`, replace: true }} component={Link} className="CardInfo-prev">
           <Icon>chevron_left</Icon>

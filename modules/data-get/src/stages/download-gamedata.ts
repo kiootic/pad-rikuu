@@ -1,6 +1,6 @@
 import { camelCase, kebabCase } from 'lodash';
 import { api, demanglePlayerID, RegionID, VersionString } from '../api';
-import { exists, formatJson, mkdir, writeTo } from '../common';
+import { exists, formatJson, mkdir, readFile, writeTo } from '../common';
 
 export async function downloadGameData(rootPath: string, apiUrl: string) {
   console.log(`downloading game data: ${apiUrl}`);
@@ -87,6 +87,7 @@ export async function downloadGameData(rootPath: string, apiUrl: string) {
     { dtp: 0 },
   ));
 
-  writeTo(formatJson(version), basePath, `version.json`);
+  const oldVersion = JSON.parse((await readFile(basePath, `version.json`)).toString('utf8'));
+  writeTo(formatJson({ ...oldVersion, ...version }), basePath, `version.json`);
   return { info, basePath };
 }
