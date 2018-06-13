@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { AppHeader } from 'src/components/app/AppHeader';
+import { parse } from 'src/parsers/DungeonNameParser';
 import { Store } from 'src/store';
 import { store } from 'src/utils';
 import './DungeonList.css';
@@ -67,8 +68,9 @@ export class DungeonList extends React.Component<Props> {
     this.scrollToSelectedItem();
   }
 
-  public componentDidUpdate() {
-    this.scrollToSelectedItem();
+  @action
+  public componentDidUpdate(props: Props) {
+    this.scrollToSelectedItem(props);
   }
 
   public render() {
@@ -85,23 +87,10 @@ export class DungeonList extends React.Component<Props> {
       <div className="DungeonList-root" ref={elem => this.root = elem!}>
         <List className="DungeonList-list">{
           dungeons.map(dungeon => {
-            let name = dungeon.name;
-            let badge = '';
+            const { name, badge: _badge, bg } = parse(dungeon.name);
             const selected = selectedDungeon && selectedDungeon.id === dungeon.id;
 
-            const bgMatch = /^\$(.{6})\$(.*)$/.exec(name);
-            if (bgMatch)
-              name = bgMatch[2];
-
-            const typeMatch = /^#(.)#(.*)$/.exec(name);
-            if (typeMatch) {
-              if (typeMatch[1] === 'C')
-                badge = 'collab';
-              else if (typeMatch[1] === 'G')
-                badge = 'guerilla';
-              name = typeMatch[2];
-            }
-
+            let badge = _badge;
             if (dungeon.weekday !== 0)
               badge = weekdays[dungeon.weekday];
             else if (dungeon.once)
@@ -110,7 +99,7 @@ export class DungeonList extends React.Component<Props> {
             return (
               <ListItem
                 key={dungeon.id} className={`DungeonList-item ${selected ? 'DungeonList-item-selected' : ''}`}
-                style={{ '--dungeon-color': bgMatch ? `#${bgMatch[1]}60` : 'transparent' } as any}
+                style={{ '--dungeon-color': bg ? `#${bg}60` : 'transparent' } as any}
                 button={true} component={Link} {...{ to: `/dungeons/${dungeon.id}` }}
               >
                 <ListItemText >
@@ -124,28 +113,18 @@ export class DungeonList extends React.Component<Props> {
           })
         }</List>
         <List className="DungeonList-list">{
-          selectedDungeon && selectedDungeon.floors.map(floor => {
-            let name = floor.name;
-            const badges: string[] = [];
-
-            const bgMatch = /^\$(.{6})\$(.*)$/.exec(name);
-            if (bgMatch)
-              name = bgMatch[2];
+          selectedDungeon && selectedDungeon.floors.slice().reverse().map(floor => {
+            const { name, bg } = parse(floor.name);
 
             return (
               <ListItem
                 key={floor.id} className="DungeonList-item"
-                style={{ '--dungeon-color': bgMatch ? `#${bgMatch[1]}60` : 'transparent' } as any}
+                style={{ '--dungeon-color': bg ? `#${bg}60` : 'transparent' } as any}
                 button={true} component={Link} {...{ to: `/dungeons/${selectedDungeon!.id}/${floor.id}` }}
               >
                 <ListItemText>
                   <span className="DungeonList-item-text">
                     {name}
-                    {badges.map(badge =>
-                      <Typography variant="caption" className="DungeonList-item-badge" key={badge}>
-                        {badge}
-                      </Typography>
-                    )}
                   </span>
                 </ListItemText>
               </ListItem>
@@ -161,7 +140,14 @@ export class DungeonList extends React.Component<Props> {
     this.selectedTab = value;
   }
 
-  private scrollToSelectedItem() {
+  private scrollToSelectedItem(props?: Props) {
+    if (props !== this.props) {
+      this.selectedTab = this.selectedDungeon ?
+        tabs.find(tab => tab.types.indexOf(this.selectedDungeon!.type) >= 0)!.label :
+        tabs[0].label;
+      return;
+    }
+
     if (!this.root) return;
     const selectedItem = this.root.querySelector('.DungeonList-item-selected');
     if (!selectedItem) return;

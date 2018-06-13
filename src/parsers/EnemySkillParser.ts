@@ -425,7 +425,9 @@ const parsers: SkillParsers = {
   [48](mul, from, to) {
     return sequence(
       hit(v.constant(1), mul / 100),
-      changeOrbs({ from: from === -1 ? loc.attributes(undefined, 1) : loc.attributes([from]), to: [to] })
+      changeOrbs({
+        from: from === -1 ? loc.attributes(undefined, 1) : loc.attributes([from]), to: to === -1 ? [] : [to]
+      })
     );
   },
   [49](level) { return cond.levelGreater(level, preemptive()); },

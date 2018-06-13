@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import * as React from 'react';
 import { CardIcon } from 'src/components/cards/CardIcon';
 import { EnemySkills } from 'src/components/enemies/EnemySkills';
-import { Curve, DungeonEnemy } from 'src/models';
+import { Card, DungeonEnemy } from 'src/models';
 import { Store } from 'src/store';
 import { store } from 'src/utils';
 import './DungeonEnemyDetails.css';
@@ -12,6 +12,7 @@ export interface DungeonEnemyDetailsProps {
   className?: string;
   enemy: DungeonEnemy;
   technical: boolean;
+  statsMul?: { hp: number, atk: number, def: number };
 }
 
 @inject('store')
@@ -38,18 +39,31 @@ export class DungeonEnemyDetails extends React.Component<DungeonEnemyDetailsProp
       );
     }
 
-    function curveValue(curve: Curve) {
-      return Math.round(Curve.valueAt(enemy.level, card.enemy.maxLevel, curve));
+    function dropEntry(id: number, level: number) {
+      if (id === 9900)
+        return <>{level} coins</>;
+      else
+        return <>LV {level} <CardIcon id={id} scale={0.3} /></>;
     }
+
+    const stats = Card.enemyStats(card, enemy.level);
+    if (this.props.statsMul) {
+      stats.hp *= this.props.statsMul.hp;
+      stats.atk *= this.props.statsMul.atk;
+      stats.def *= this.props.statsMul.def;
+    }
+    stats.hp = Math.round(stats.hp);
+    stats.atk = Math.round(stats.atk);
+    stats.def = Math.round(stats.def);
 
     return (
       <div className={`${this.props.className || ''} DungeonEnemyDetails-root`}>
         <CardIcon id={enemy.id} scale={0.75} />
         <div className="DungeonEnemyDetails-content">
           <div className="DungeonEnemyDetails-stats">
-            {statEntry('HP', curveValue(card.enemy.hp))}
-            {statEntry('DEF', curveValue(card.enemy.def))}
-            {statEntry('ATK', curveValue(card.enemy.atk))}
+            {statEntry('HP', stats.hp)}
+            {statEntry('DEF', stats.def)}
+            {statEntry('ATK', stats.atk)}
             {statEntry('TURN', card.enemy.countdown)}
           </div>
           {
@@ -57,11 +71,11 @@ export class DungeonEnemyDetails extends React.Component<DungeonEnemyDetailsProp
               drops: {
                 enemy.drops.map((drop, i) => <React.Fragment key={i}>
                   {i !== 0 && ', '}
-                  LV {drop.level} <CardIcon id={drop.id} scale={0.3} />
+                  {dropEntry(drop.id, drop.level)}
                 </React.Fragment>)
               } </div>
           }
-          {this.props.technical &&<EnemySkills id={enemy.id} level={enemy.level} />}
+          {this.props.technical && <EnemySkills id={enemy.id} level={enemy.level} stats={stats} />}
         </div>
       </div>
     );

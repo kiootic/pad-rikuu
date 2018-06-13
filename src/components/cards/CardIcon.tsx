@@ -42,7 +42,7 @@ export class CardIcon extends React.Component<CardIconProps> {
       if (!card) return link;
 
       return (
-        <HoverPopup header={link}>
+        <HoverPopup header={link} className={this.props.className}>
           <Typography className="CardIcon-info">
             <span className="CardIcon-info-header">
               <Typography variant="caption" className="CardIcon-info-no">No. {card.id}</Typography>

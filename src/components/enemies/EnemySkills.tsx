@@ -19,6 +19,7 @@ export interface EnemySkillsProps {
   id: number;
   level: number;
   showPlaceholder?: boolean;
+  stats?: { atk: number };
 }
 
 @inject('store')
@@ -45,7 +46,7 @@ export class EnemySkills extends React.Component<EnemySkillsProps> {
     if (skills.length === 0 && this.props.showPlaceholder)
       return 'none';
 
-    const data = {
+    const data = this.props.stats || {
       atk: Curve.valueAt(this.level, this.card.enemy.maxLevel, this.card.enemy.atk)
     };
 
@@ -87,8 +88,8 @@ function renderValue(value: SkillValue, isPercent = false) {
 }
 
 function renderDamage(value: SkillValue, data: EnemyData, times: SkillValue = { min: 1, max: 1 }) {
-  const min = Math.floor(value.min * data.atk) * times.min;
-  const max = Math.floor(value.max * data.atk) * times.max;
+  const min = Math.round(value.min * data.atk) * times.min;
+  const max = Math.round(value.max * data.atk) * times.max;
   return <span className="EnemySkills-damage">({min === max ? min : `${min} ~ ${max}`})</span>;
 }
 
@@ -154,7 +155,8 @@ function renderActions(action: EnemySkill | EnemySkill[], data: EnemyData): Reac
         }</Typography>
         <div className="EnemySkills-action-header">
           {action.title && <Typography variant="subheading">{action.title}</Typography>}
-          {action.message && <Typography variant="caption" style={{ whiteSpace: 'pre' }}>
+          {/* action.message sometimes can be a number (?) */}
+          {typeof action.message === 'string' && <Typography variant="caption" style={{ whiteSpace: 'pre' }}>
             {action.message.replace('|', '\n')}
           </Typography>}
         </div>
@@ -512,21 +514,29 @@ function renderSkill(action: EnemySkill, data: EnemyData): React.ReactNode {
 
       children = <>
         {changes.map(({ from, to, exclude, locked }, i) => {
-          return <span key={i}>{i !== 0 && ', '}
-            {renderLocation(from)}
-            {
-              exclude && renderOrbs(exclude).map((orb, j) => (
-                <AssetBox className="EnemySkills-icon-box" key={j}>
-                  {orb}
-                  <Asset assetId="overlay-cross" className="EnemySkills-icon" />
-                </AssetBox>
-              ))
-            } &rArr; {renderOrbs(to).map((orb, j) => locked ?
-              <AssetBox className="EnemySkills-icon-box" key={j}>
-                {orb}
-                <Asset assetId="orb-locked" className="EnemySkills-icon" />
-              </AssetBox> : orb
-            )}</span>;
+          return (
+            <span key={i}>
+              {i !== 0 && ', '}
+              {renderLocation(from)}
+              {
+                exclude && renderOrbs(exclude).map((orb, j) => (
+                  <AssetBox className="EnemySkills-icon-box" key={j}>
+                    {orb}
+                    <Asset assetId="overlay-cross" className="EnemySkills-icon" />
+                  </AssetBox>
+                ))
+              } &rArr; {
+                to.length === 0 ?
+                  'random attribute' :
+                  renderOrbs(to).map((orb, j) => locked ?
+                    <AssetBox className="EnemySkills-icon-box" key={j}>
+                      {orb}
+                      <Asset assetId="orb-locked" className="EnemySkills-icon" />
+                    </AssetBox> : orb
+                  )
+              }
+            </span>
+          );
         })}
       </>;
       break;

@@ -28,3 +28,9 @@
   align-items: center;
   padding: 2px 16px;
 }
+
+@media (max-width: 600px) {
+  .DungeonEnemyDetails-stats-entry {
+    width: 50%;
+  }
+}

@@ -11,3 +11,11 @@
   max-width: 900px;
   position: relative;
 }
+
+@media (max-width: 600px) {
+  .DungeonInfo-root {
+    display: block;
+    padding: 0;
+    width: 100%;
+  }
+}

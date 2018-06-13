@@ -9,13 +9,35 @@
 
 .DungeonDetails-header {
   display: flex;
+  flex-flow: row wrap;
 }
 .DungeonDetails-header > * {
-  margin: 0 8px;
+  margin: 2px 8px;
 }
 .DungeonDetails-header > a {
   text-decoration: none;
   border-bottom: 1px dashed #808080;
+}
+
+.DungeonDetails-notes {
+  list-style: none;
+  margin: 0;
+}
+.DungeonDetails-notes:not(:empty) {
+  padding: 8px;
+}
+.DungeonDetails-notes > li {
+  display: flex;
+  align-items: center;
+  line-height: 32px;
+}
+.DungeonDetails-notes > li::before {
+  content: '-';
+  display: block;
+  margin-right: 4px;
+}
+.DungeonDetails-notes-card {
+  display: inline-block;
 }
 
 .DungeonDetails-stats {
@@ -31,10 +53,10 @@
 }
 .DungeonDetails-stats-header {
   font-weight: bold;
-  width: 50%;
+  width: 40%;
 }
 .DungeonDetails-stats-value {
-  width: 50%;
+  width: 60%;
 }
 
 .DungeonDetails-wave-header {
@@ -52,4 +74,15 @@
 
 .DungeonDetails-enemy:not(:last-child) {
   border-bottom: 1px solid #808080;
+}
+
+@media (max-width: 600px) {
+  .DungeonDetails-section {
+    margin: 8px 0;
+  }
+  .DungeonDetails-header {
+  }
+  .DungeonDetails-stats-entry {
+    width: 100%;
+  }
 }

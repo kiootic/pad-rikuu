@@ -70,6 +70,7 @@
 .EnemySkills-action-sequence {
   border: 1px solid #606060;
   padding: 8px;
+  margin-bottom: 8px;
 }
 
 .EnemySkills-icon, .EnemySkills-icon-box {

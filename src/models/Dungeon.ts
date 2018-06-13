@@ -29,7 +29,7 @@ export interface Floor {
   minRank?: number;
   properties?: string[];
   conditions? : {
-    type: number;
+    type: ConditionType;
     values: number[];
   };
 }
@@ -55,4 +55,15 @@ export enum RFlags2 {
   NoContinue = 0x100,
   NoRewards = 0x200,
   NoAwokenSkill = 0x400,
+}
+
+export enum ConditionType {
+  Cost = 2,
+  Rarity = 4,
+  Type = 7,
+  Attributes = 9,
+  NoDupe = 10,
+  RogueLike = 11,
+  Card = 13,
+  Count = 14,
 }

@@ -2,7 +2,7 @@ import { FormControl, TextField } from '@material-ui/core';
 import { computed } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
-import { Curve } from 'src/models';
+import { Card } from 'src/models';
 import { Store } from 'src/store';
 import { bound, store } from 'src/utils';
 import './EnemyStats.css';
@@ -28,12 +28,7 @@ export class EnemyStats extends React.Component<EnemyStatsProps> {
   @computed
   private get level() { return this.props.level; }
 
-  @computed private get maxLevel() { return this.card.enemy.maxLevel; }
-  @computed private get hp() { return this.curve(this.card.enemy.hp); }
-  @computed private get atk() { return this.curve(this.card.enemy.atk); }
-  @computed private get def() { return this.curve(this.card.enemy.def); }
-  @computed private get exp() { return this.curve({ min: this.card.enemy.exp / 2 }); }
-  @computed private get coin() { return this.curve({ min: this.card.enemy.coin / 2 }); }
+  @computed private get stats() { return Card.enemyStats(this.card, this.level); }
 
   public render() {
     if (!this.card) return null;
@@ -47,6 +42,8 @@ export class EnemyStats extends React.Component<EnemyStatsProps> {
       );
     }
 
+    const stats = this.stats;
+
     return (
       <div className="EnemyStats-root">
         {entry('LV',
@@ -54,11 +51,11 @@ export class EnemyStats extends React.Component<EnemyStatsProps> {
             <TextField type="number" value={this.level} onChange={this.selectLevel} />
           </FormControl>
         )}
-        {entry('EXP', this.exp)}
-        {entry('COIN', this.coin)}
-        {entry('HP', this.hp)}
-        {entry('ATK', this.atk)}
-        {entry('DEF', this.def)}
+        {entry('EXP', Math.round(stats.exp))}
+        {entry('COIN', Math.round(stats.coin))}
+        {entry('HP', Math.round(stats.hp))}
+        {entry('ATK', Math.round(stats.atk))}
+        {entry('DEF', Math.round(stats.def))}
       </div>
     );
   }
@@ -66,18 +63,5 @@ export class EnemyStats extends React.Component<EnemyStatsProps> {
   @bound
   private selectLevel(e: React.ChangeEvent<HTMLInputElement>) {
     this.props.selectLevel(Number(e.target.value));
-  }
-
-  private curve(curve: Curve | { min: number, max?: number, scale?: number }) {
-    const level = this.level;
-
-    const realCurve: Curve = {
-      min: curve.min,
-      max: curve.max || (curve.min * this.maxLevel),
-      scale: curve.scale || 1
-    };
-
-    const value = Curve.valueAt(level, this.maxLevel, realCurve);
-    return Math.round(value);
   }
 }
