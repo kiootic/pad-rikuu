@@ -9,7 +9,7 @@ import { DungeonEnemyDetails } from 'src/components/dungeon/DungeonEnemyDetails'
 import { Attributes, Card, ConditionType, Dungeon, DungeonData, DungeonEnemy, RFlags1, RFlags2, Types } from 'src/models';
 import { parse } from 'src/parsers/DungeonNameParser';
 import { Store } from 'src/store';
-import { parseFlags, prop, store, withWidth } from 'src/utils';
+import { parseFlags, store } from 'src/utils';
 import './DungeonDetails.css';
 
 /* tslint:disable:no-bitwise */
@@ -20,15 +20,11 @@ export interface DungeonDetailsProps {
   floor: number;
 }
 
-@withWidth()
 @inject('store')
 @observer
 export class DungeonDetails extends React.Component<DungeonDetailsProps> {
   @store
   private readonly store: Store;
-
-  @prop('width')
-  private readonly width: string;
 
   @computed
   private get dungeon() {
@@ -202,7 +198,7 @@ export class DungeonDetails extends React.Component<DungeonDetailsProps> {
         </Paper>
         {data && <section className="DungeonDetails-section">{
           data.waves.map((wave, i) => (
-            <ExpansionPanel key={i} defaultExpanded={this.width !== 'xs'}>
+            <ExpansionPanel key={i} defaultExpanded={false} CollapseProps={{ unmountOnExit: true }}>
               <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
                 <div className="DungeonDetails-wave-header">
                   <Typography>Wave {i + 1}</Typography>
