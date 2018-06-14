@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { AppHeader } from 'src/components/app/AppHeader';
 import { DungeonDetails } from 'src/components/dungeon/DungeonDetails';
+import { parse } from 'src/parsers/DungeonNameParser';
 import { Store } from 'src/store';
 import { store } from 'src/utils';
 import './DungeonInfo.css';
@@ -25,7 +26,7 @@ export class DungeonInfo extends React.Component<RouteComponentProps<{ dungeon: 
 
     return <>
       <Helmet>
-        <title>{`${dungeon.name} - ${dungeon.floors.find(f => f.id === floor)!.name}`}</title>
+        <title>{`${parse(dungeon.name).name} - ${parse(dungeon.floors.find(f => f.id === floor)!.name).name}`}</title>
       </Helmet>
       <AppHeader>
         <IconButton disabled={!prev} {...{ to: `/dungeons/${dungeon.id}/${prev && prev.id}`, replace: true }} component={Link} className="CardInfo-prev">
