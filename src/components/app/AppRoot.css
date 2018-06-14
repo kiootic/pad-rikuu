@@ -5,6 +5,17 @@
   flex-direction: column;
 }
 
+.AppRoot-error {
+  padding: 16px;
+}
+.AppRoot-error > * {
+  margin: 16px;
+}
+.AppRoot-error-stack {
+  white-space: pre;
+  font-family: monospace;
+}
+
 @media (min-width: 1280px) {
   .AppRoot-content {
     margin-left: 320px;
