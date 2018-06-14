@@ -58,8 +58,7 @@ async function optimizeFile(path: string) {
 
 export async function optimizeImages(dataPath: string) {
   mkdirp(join('data', 'images'));
-  const current = readFileSync(join(dataPath, 'images', 'current')).toString('utf8');
-  const basePath = join(dataPath, 'images', current);
+  const basePath = join(dataPath, 'images');
 
   const extlist: { isCards: boolean, files: string[] }[] = JSON.parse(
     readFileSync(join(basePath, 'extlist.json')).toString('utf8')

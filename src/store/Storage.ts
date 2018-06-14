@@ -79,7 +79,11 @@ export class Storage {
       return resp;
 
     try {
-      const fetchResp = await fetch(new URL(path, this._baseUrl).toString());
+      const init: RequestInit = { method: 'GET' };
+      if (opt === CacheOptions.Ignore)
+        init.cache = 'no-cache';
+
+      const fetchResp = await fetch(new URL(path, this._baseUrl).toString(), init);
       if (fetchResp.ok)
         resp = fetchResp;
       else

@@ -10,6 +10,7 @@
     "@types/mkdirp": "^0.5.2",
     "@types/moment-timezone": "^0.5.5",
     "@types/node": "6",
+    "@types/rimraf": "^2.0.2",
     "@types/sharp": "^0.17.8",
     "ts-node": "^6.0.5",
     "tslint": "^5.10.0",
@@ -25,6 +26,7 @@
     "mkdirp": "^0.5.1",
     "moment-timezone": "^0.5.17",
     "node-apk-parser": "^0.2.3",
+    "rimraf": "^2.6.2",
     "sharp": "^0.20.3",
     "sqlite": "^2.9.2"
   }
