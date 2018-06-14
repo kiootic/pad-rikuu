@@ -49,7 +49,7 @@ async function optimizeFile(path: string) {
     writeFileSync(join('data', 'images', `${name}.json`), data);
     return `${name}.json`;
   } else if (ext.toLowerCase() === 'png') {
-    let data = readFileSync(path);
+    const data = readFileSync(path);
     writeFileSync(join('data', 'images', `${name}.png`), data);
     return `${name}.png`;
   }
@@ -60,7 +60,7 @@ export async function optimizeImages(dataPath: string) {
   mkdirp(join('data', 'images'));
   const basePath = join(dataPath, 'images');
 
-  const extlist: { isCards: boolean, files: string[] }[] = JSON.parse(
+  const extlist: Array<{ isCards: boolean, files: string[] }> = JSON.parse(
     readFileSync(join(basePath, 'extlist.json')).toString('utf8')
   );
   await Promise.all(extlist

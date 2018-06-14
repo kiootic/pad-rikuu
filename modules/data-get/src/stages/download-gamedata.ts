@@ -87,7 +87,7 @@ export async function downloadGameData(rootPath: string, apiUrl: string) {
     { dtp: 0 },
   ));
 
-  const oldVersion = JSON.parse((await readFile(basePath, `version.json`)).toString('utf8'));
-  writeTo(formatJson({ ...oldVersion, ...version }), basePath, `version.json`);
+  const oldVersion = JSON.parse((await readFile(basePath, 'version.json')).toString('utf8'));
+  writeTo(formatJson({ ...oldVersion, ...version }), basePath, 'version.json');
   return { info, basePath };
 }

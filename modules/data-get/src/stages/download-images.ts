@@ -1,9 +1,9 @@
 import Axios from 'axios';
 import { padStart } from 'lodash';
-import { allWithProgress, formatJson, mkdir, queueWork, writeTo, exists, readFile } from '../common';
-import { decodeTex } from '../texture';
-import { sync as rimraf } from 'rimraf';
 import { join } from 'path';
+import { sync as rimraf } from 'rimraf';
+import { allWithProgress, exists, formatJson, mkdir, queueWork, readFile, writeTo } from '../common';
+import { decodeTex } from '../texture';
 /* tslint:disable:no-bitwise */
 
 interface Entry {
