@@ -17,7 +17,7 @@ export class Settings extends React.Component {
 
   public render() {
     return <>
-      <AppHeader />
+      <AppHeader backButton={true} />
       <Tabs value={this.value} onChange={this.onChange} scrollable={true} scrollButtons="auto">
         {pages.map((page, i) => <Tab label={page.title} key={i} />)}
       </Tabs>

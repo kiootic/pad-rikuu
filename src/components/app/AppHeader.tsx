@@ -1,4 +1,5 @@
 import { AppBar, Hidden, Icon, IconButton, MuiThemeProvider, Toolbar, Typography } from '@material-ui/core';
+import { History } from 'history';
 import { action, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import * as React from 'react';
@@ -6,14 +7,16 @@ import { Link } from 'react-router-dom';
 import { AppController } from 'src/components/app/AppRoot';
 import { AppSearch } from 'src/components/app/AppSearch';
 import { themeInvert } from 'src/theme';
-import { bound, prop } from 'src/utils';
+import { bound, prop, withRouter } from 'src/utils';
 import './AppHeader.css';
 
 export interface AppHeaderProps {
   children?: React.ReactNode;
+  backButton?: boolean;
 }
 
 @inject('app')
+@withRouter
 @observer
 export class AppHeader extends React.Component<AppHeaderProps> {
   @observable
@@ -21,6 +24,9 @@ export class AppHeader extends React.Component<AppHeaderProps> {
 
   @prop('app')
   private readonly app: AppController;
+
+  @prop('history')
+  private readonly history: History;
 
   private root: HTMLElement | null = null;
 
@@ -30,9 +36,12 @@ export class AppHeader extends React.Component<AppHeaderProps> {
         <AppBar position="fixed" id="appHeader">
           <Toolbar className="AppHeader-root">
             <Hidden lgUp={true}>
-              <IconButton onClick={this.app.openDrawer} className="AppHeader-menu"><Icon>menu</Icon></IconButton>
+              {this.props.backButton === true ?
+                <IconButton onClick={this.goBack} className="AppHeader-menu"><Icon>arrow_back</Icon></IconButton> :
+                <IconButton onClick={this.app.openDrawer} className="AppHeader-menu"><Icon>menu</Icon></IconButton>
+              }
               <Typography variant="title" className="AppHeader-title" component={Link as any} {...{ to: '/' }}>
-                  Rikuu
+                Rikuu
               </Typography>
             </Hidden>
             <div className="AppHeader-spacer" />
@@ -52,6 +61,11 @@ export class AppHeader extends React.Component<AppHeaderProps> {
         </AppBar >
       </div >
     );
+  }
+
+  @bound
+  private goBack() {
+    this.history.goBack();
   }
 
   @action.bound

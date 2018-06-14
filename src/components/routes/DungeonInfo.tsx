@@ -28,7 +28,7 @@ export class DungeonInfo extends React.Component<RouteComponentProps<{ dungeon: 
       <Helmet>
         <title>{`${parse(dungeon.name).name} - ${parse(dungeon.floors.find(f => f.id === floor)!.name).name}`}</title>
       </Helmet>
-      <AppHeader>
+      <AppHeader backButton={true}>
         <IconButton disabled={!prev} {...{ to: `/dungeons/${dungeon.id}/${prev && prev.id}`, replace: true }} component={Link} className="CardInfo-prev">
           <Icon>chevron_left</Icon>
         </IconButton>
