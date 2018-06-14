@@ -5,7 +5,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  animation-duration: 4s;
+  animation-name: show-loading;
+  animation-fill-mode: forwards;
 }
 .App-loading:before {
   content: 'loading...';
+}
+
+@keyframes show-loading {
+  from {
+    opacity: 0;
+  }
+  
+  75% {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
